@@ -11,7 +11,7 @@
 | **Language** | C# (.NET Framework 4.8) |
 | **UI Framework** | WPF (Windows Presentation Foundation) |
 | **Vision Library** | Cognex In-Sight SDK |
-| **Database** | SQLite (또는 MS-SQL) |
+| **Database** | SQLite |
 | **Protocol** | TCP/IP Native Mode, SDK Event Handling |
 
 ---
@@ -27,7 +27,7 @@
 * **Data Persistence**
   * 검사 로그(OK/NG, 치수, 타임스탬프)의 로컬 DB 저장 및 이력 조회 시스템
 * **Error Handling**
-  * 통신 단절 시 자동 재접속(Auto-Reconnect) 로직 및 예외 처리 프로세스
+  * 통신 끊김시 자동 재연결(Auto-Reconnect) 로직 및 예외 처리 프로세스
 
 ---
 
