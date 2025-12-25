@@ -1,0 +1,10 @@
+# Visual Studio 관련
+bin/
+obj/
+*.user
+*.suo
+.vs/
+
+# Cognex In-Sight 관련 임시 파일
+*.job.bak
+*.xml.bak
