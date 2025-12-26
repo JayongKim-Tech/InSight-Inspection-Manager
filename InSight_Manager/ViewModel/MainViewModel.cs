@@ -8,21 +8,31 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using System.Windows.Forms;
-
+using System.Windows.Media.Imaging;
 
 namespace InSight_Manager.ViewModel
 {
     public class MainViewModel: ViewModelBase
     {
         ConnectModel model = new ConnectModel();
+        ImageManagerModel imageManagerModel = new ImageManagerModel();
 
         private string _ipAddress = "127.0.0.1";
         private int port = 23;
         private string _status = "Null";
-        private string _selectedFolderPath = "Default";
+        private string _selectedFolderPath = null;
+
+        private List<string> _files;
+
+        private BitmapImage _image = null;
 
         public ICommand ConnectCommand { get; }
         public ICommand SelectFolderCommand { get; }
+        public ICommand NextImageCommand { get; }
+        public ICommand PrevImageCommand { get; }
+
+
+
 
         public string IpAddress
         {
@@ -46,10 +56,20 @@ namespace InSight_Manager.ViewModel
 
         public string SelectedFolderPath
         {
-            get => _status;
+            get => _selectedFolderPath;
             set
             {
-                _status = value;
+                _selectedFolderPath = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public BitmapImage DisplayedImage
+        {
+            get => _image;
+            set
+            {
+                _image = value;
                 OnPropertyChanged();
             }
         }
@@ -68,32 +88,30 @@ namespace InSight_Manager.ViewModel
 
         private void SelectFolder(object obj)
         {
-            // 1. 다이얼로그 인스턴스 생성 (using을 써서 사용 후 바로 메모리 해제)
-            using (var dialog = new System.Windows.Forms.FolderBrowserDialog())
-            {
-                // 창 상단에 뜰 설명 텍스트
-                dialog.Description = "이미지가 저장된 폴더를 선택하세요";
+            SelectedFolderPath =  imageManagerModel.SelectFolder(SelectedFolderPath);
 
-                // '새 폴더 만들기' 버튼 숨기기 (단순 선택용이면 false 추천)
-                dialog.ShowNewFolderButton = false;
-
-                // 2. 창 띄우기 (사용자가 '확인'을 눌렀는지 체크)
-                System.Windows.Forms.DialogResult result = dialog.ShowDialog();
-
-                // 3. 결과 처리
-                if (result == System.Windows.Forms.DialogResult.OK && !string.IsNullOrWhiteSpace(dialog.SelectedPath))
-                {
-                    // [중요] 사용자가 선택한 경로가 이 변수에 담깁니다.
-                    SelectedFolderPath = dialog.SelectedPath;
-                }
-            }
+            _files = imageManagerModel.GetImageFiles(SelectedFolderPath);
         }
+
+        private void NextImage(object obj)
+        {
+            DisplayedImage = imageManagerModel.LoadBitmap(imageManagerModel.NextImage(_files));
+        }
+
+        private void PrevImage(object obj)
+        {
+            DisplayedImage = imageManagerModel.LoadBitmap(imageManagerModel.PrevImage(_files));
+        }
+
 
         public MainViewModel()
         {
             // ConnectCommand를 누르면 OnConnect 함수를 실행해라!
             ConnectCommand = new RelayCommand(OnConnect);
             SelectFolderCommand = new RelayCommand(SelectFolder);
+            NextImageCommand = new RelayCommand(NextImage);
+            PrevImageCommand = new RelayCommand(PrevImage);
+
         }
 
 
