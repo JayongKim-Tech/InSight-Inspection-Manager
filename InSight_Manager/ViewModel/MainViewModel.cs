@@ -91,6 +91,8 @@ namespace InSight_Manager.ViewModel
             SelectedFolderPath =  imageManagerModel.SelectFolder(SelectedFolderPath);
 
             _files = imageManagerModel.GetImageFiles(SelectedFolderPath);
+
+            DisplayedImage = imageManagerModel.LoadBitmap(imageManagerModel.Showiamge(_files));
         }
 
         private void NextImage(object obj)

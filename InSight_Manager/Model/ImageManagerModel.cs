@@ -58,6 +58,12 @@ namespace InSight_Manager.Model
 
         }
 
+        public String Showiamge(List<string> files)
+        {
+            _image = files[currentIndex];
+
+            return _image;
+        }
         public String NextImage(List<string> files)
         {
             currentIndex += 1;
@@ -77,7 +83,14 @@ namespace InSight_Manager.Model
 
                 return _image;
             }
-            return null;
+            else
+            {
+                currentIndex = files.Count - 1;
+
+                _image = files[currentIndex];
+
+                return _image;
+            }
         }
 
         public BitmapImage LoadBitmap(string filePath)
