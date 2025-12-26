@@ -5,7 +5,7 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Insight_Manager.Model
+namespace InSight_Manager.Model
 {
     public class ConnectModel
     {

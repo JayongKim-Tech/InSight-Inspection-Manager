@@ -1,33 +1,17 @@
-﻿using InSight_Inspection_Manager;
-using Insight_Manager.ViewModel;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using InSight_Manager.ViewModel;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
-namespace Insight_Manager.View
+// [중요] XAML의 x:Class="InSight_Manager.View.MainWindow"와 똑같아야 합니다.
+namespace InSight_Manager.View
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
     public partial class MainWindow : Window
     {
         public MainWindow()
         {
-            InitializeComponent();
+            InitializeComponent(); // 이제 에러 안 날 겁니다!
 
+            // ViewModel 연결 (혹시 ViewModel이 없다면 이 줄은 일단 주석 처리 // 하세요)
             this.DataContext = new MainViewModel();
-
         }
     }
 }
