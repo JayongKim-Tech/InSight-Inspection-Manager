@@ -21,7 +21,7 @@ namespace InSight_Manager.ViewModel
         private int port = 23;
         private string _status = "Null";
         private string _selectedFolderPath = null;
-
+        private string _fileName = null;
         private List<string> _files;
 
         private BitmapImage _image = null;
@@ -33,7 +33,15 @@ namespace InSight_Manager.ViewModel
 
 
 
-
+        public string CurrentImageName
+        {
+            get => _fileName;
+            set
+            {
+                _fileName = value;
+                OnPropertyChanged();
+            }
+        }
         public string IpAddress
         {
             get => _ipAddress;
@@ -92,16 +100,19 @@ namespace InSight_Manager.ViewModel
 
             _files = imageManagerModel.GetImageFiles(SelectedFolderPath);
 
+            CurrentImageName = imageManagerModel.Showiamge(_files);
             DisplayedImage = imageManagerModel.LoadBitmap(imageManagerModel.Showiamge(_files));
         }
 
         private void NextImage(object obj)
         {
+            CurrentImageName = imageManagerModel.NextImage(_files);
             DisplayedImage = imageManagerModel.LoadBitmap(imageManagerModel.NextImage(_files));
         }
 
         private void PrevImage(object obj)
         {
+            CurrentImageName = imageManagerModel.PrevImage(_files);
             DisplayedImage = imageManagerModel.LoadBitmap(imageManagerModel.PrevImage(_files));
         }
 
