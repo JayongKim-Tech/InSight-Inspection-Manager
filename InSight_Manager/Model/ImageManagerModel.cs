@@ -60,9 +60,13 @@ namespace InSight_Manager.Model
 
         public String Showiamge(List<string> files)
         {
-            _image = files[currentIndex];
+            if(files.Count > 0)
+            {
+                _image = files[currentIndex];
+                return _image;
+            }
+            return null;
 
-            return _image;
         }
         public String NextImage(List<string> files)
         {
