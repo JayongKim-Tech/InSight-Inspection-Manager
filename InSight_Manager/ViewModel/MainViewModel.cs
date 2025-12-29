@@ -6,16 +6,21 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Input;
 using System.Windows.Forms;
+using System.Windows.Input;
+using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using static System.Resources.ResXFileRef;
 
 namespace InSight_Manager.ViewModel
 {
     public class MainViewModel: ViewModelBase
     {
+
+
         ConnectModel model = new ConnectModel();
         ImageManagerModel imageManagerModel = new ImageManagerModel();
+        BrushConverter converter = new BrushConverter();
 
         private string _ipAddress = "127.0.0.1";
         private int port = 23;
@@ -26,13 +31,17 @@ namespace InSight_Manager.ViewModel
 
         private BitmapImage _image = null;
 
+        private string _connectStatus = "Offline";
+        private Brush _connectStatusColor;
+
         public ICommand ConnectCommand { get; }
         public ICommand SelectFolderCommand { get; }
         public ICommand NextImageCommand { get; }
         public ICommand PrevImageCommand { get; }
 
 
-
+        public bool IsLiveMode { get; set; }
+        public bool IsLocalMode => !IsLiveMode;
         public string CurrentImageName
         {
             get => _fileName;
@@ -72,6 +81,26 @@ namespace InSight_Manager.ViewModel
             }
         }
 
+        public string ConnectionStatusText
+        {
+            get => _connectStatus;
+            set
+            {
+                _connectStatus = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public Brush ConnectionStatusColor
+        {
+            get => _connectStatusColor;
+            set
+            {
+                _connectStatusColor = value;
+                OnPropertyChanged();
+            }
+        }
+
         public BitmapImage DisplayedImage
         {
             get => _image;
@@ -81,15 +110,17 @@ namespace InSight_Manager.ViewModel
                 OnPropertyChanged();
             }
         }
-        private void OnConnect(object obj)
+        private void OnConnect()
         {
             if(model.Connect(IpAddress, port))
             {
-                Status = "OK";
+                ConnectionStatusText = "Online";
+                ConnectionStatusColor = (Brush)converter.ConvertFromString("#00FF00");
             }
             else
             {
-                Status = "Fail";
+                ConnectionStatusText = "Offline";
+                ConnectionStatusColor = (Brush)converter.ConvertFromString("#FF0000");
             }
 
         }
@@ -100,8 +131,11 @@ namespace InSight_Manager.ViewModel
 
             _files = imageManagerModel.GetImageFiles(SelectedFolderPath);
 
-            CurrentImageName = imageManagerModel.Showiamge(_files);
-            DisplayedImage = imageManagerModel.LoadBitmap(imageManagerModel.Showiamge(_files));
+            if(_files != null)
+            {
+                CurrentImageName = imageManagerModel.Showiamge(_files);
+                DisplayedImage = imageManagerModel.LoadBitmap(imageManagerModel.Showiamge(_files));
+            }
         }
 
         private void NextImage(object obj)
@@ -120,10 +154,10 @@ namespace InSight_Manager.ViewModel
         public MainViewModel()
         {
             // ConnectCommand를 누르면 OnConnect 함수를 실행해라!
-            ConnectCommand = new RelayCommand(OnConnect);
             SelectFolderCommand = new RelayCommand(SelectFolder);
             NextImageCommand = new RelayCommand(NextImage);
             PrevImageCommand = new RelayCommand(PrevImage);
+            OnConnect();
 
         }
 

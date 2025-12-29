@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Media.Imaging;
 
 namespace InSight_Manager.Model
@@ -60,22 +61,35 @@ namespace InSight_Manager.Model
 
         public String Showiamge(List<string> files)
         {
-            if(files.Count > 0)
+            if (files.Count > 0)
             {
                 _image = files[currentIndex];
-                return _image;
             }
-            return null;
+
+            return _image;
 
         }
         public String NextImage(List<string> files)
         {
-            currentIndex += 1;
+            if (files.Count-1 > currentIndex)
+            {
+                currentIndex += 1;
 
-            _image = files[currentIndex];
+                _image = files[currentIndex];
 
-            return _image;
-        }
+                return _image;
+            }
+            else
+            {
+                currentIndex = 0;
+
+                _image = files[currentIndex];
+
+                return _image;
+            }
+
+
+            }
 
         public String PrevImage(List<string> files)
         {
@@ -100,12 +114,17 @@ namespace InSight_Manager.Model
         public BitmapImage LoadBitmap(string filePath)
         {
             BitmapImage bitmap = new BitmapImage();
-            bitmap.BeginInit();
-            bitmap.CacheOption = BitmapCacheOption.OnLoad; // 메모리에 올리고 파일 연결 끊기
-            bitmap.UriSource = new Uri(filePath);
-            bitmap.EndInit();
-            bitmap.Freeze();
+
+            if (filePath != null)
+            {
+                bitmap.BeginInit();
+                bitmap.CacheOption = BitmapCacheOption.OnLoad; // 메모리에 올리고 파일 연결 끊기
+                bitmap.UriSource = new Uri(filePath);
+                bitmap.EndInit();
+                bitmap.Freeze();
+            }
             return bitmap;
+
         }
     }
 }
