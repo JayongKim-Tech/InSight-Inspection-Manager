@@ -116,7 +116,8 @@
                    Visibility="{Binding IsLocalMode, Converter={StaticResource BooleanToVisibilityConverter}}"/>
 
             <wf:WindowsFormsHost
-                localHelpers:InSightBehavior.SensorSource="{Binding MyInsightSensor}"
+                localHelpers:InSightBehavior.ShowSpreadsheet="{Binding IsSpreadsheetVisible}"
+                localHelpers:InSightBehavior.SensorSource="{Binding IsInSightSensor}"
                 Visibility="{Binding IsLiveMode, Converter={StaticResource BooleanToVisibilityConverter}}">
                 <cog:CvsInSightDisplay x:Name="cvsInSightDisplay1" />
             </wf:WindowsFormsHost>
@@ -157,7 +158,13 @@
                                FontSize="32" FontWeight="Bold"/>
                 </StackPanel>
 
+
                 <StackPanel Grid.Column="2" Orientation="Horizontal">
+                    <Button Content="Spreadsheet On/Off" Padding="20,10"
+                            Command="{Binding ToggleSpreadsheetCommand}"
+                            Background="#68217A" Foreground="White" BorderThickness="0"
+                            Margin="0,0,10,0"/>
+
                     <Button Content="Manual Trigger" Padding="20,10"
                             Background="#007ACC" Foreground="White" BorderThickness="0"
                             Margin="0,0,10,0"/>

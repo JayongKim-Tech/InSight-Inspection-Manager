@@ -22,11 +22,17 @@ namespace InSight_Manager.ViewModel
         ImageManagerModel imageManagerModel = new ImageManagerModel();
         BrushConverter converter = new BrushConverter();
 
-        private string _ipAddress = "127.0.0.1";
+        private string _ipAddress = "127799.0.0.1";
         private int port = 23;
         private string _status = "Null";
         private string _selectedFolderPath = null;
         private string _fileName = null;
+
+        private bool _isSpreadsheetVisible = false;
+
+        private bool _isLocalMode = true;
+        private bool _isLiveMode = false;
+
         private List<string> _files;
 
         private BitmapImage _image = null;
@@ -39,9 +45,28 @@ namespace InSight_Manager.ViewModel
         public ICommand NextImageCommand { get; }
         public ICommand PrevImageCommand { get; }
 
+        public ICommand ToggleSpreadsheetCommand { get; }
 
-        public bool IsLiveMode { get; set; }
-        public bool IsLocalMode => !IsLiveMode;
+
+        public bool IsLiveMode
+        {
+            get => _isLiveMode;
+            set
+            {
+                _isLiveMode = value;
+                OnPropertyChanged();
+            }
+        }
+        public bool IsLocalMode
+        {
+            get => _isLocalMode;
+            set
+            {
+                _isLocalMode = value;
+                OnPropertyChanged();
+            }
+        }
+
         public string CurrentImageName
         {
             get => _fileName;
@@ -91,6 +116,15 @@ namespace InSight_Manager.ViewModel
             }
         }
 
+        public bool IsSpreadsheetVisible
+        {
+            get => _isSpreadsheetVisible;
+            set
+            {
+                _isSpreadsheetVisible = value;
+                OnPropertyChanged();
+            }
+        }
         public Brush ConnectionStatusColor
         {
             get => _connectStatusColor;
@@ -112,7 +146,7 @@ namespace InSight_Manager.ViewModel
         }
         private void OnConnect()
         {
-            if(model.Connect(IpAddress, port))
+            if(model.ConnectToEmulator(IpAddress))
             {
                 ConnectionStatusText = "Online";
                 ConnectionStatusColor = (Brush)converter.ConvertFromString("#00FF00");
@@ -140,16 +174,46 @@ namespace InSight_Manager.ViewModel
 
         private void NextImage(object obj)
         {
-            CurrentImageName = imageManagerModel.NextImage(_files);
-            DisplayedImage = imageManagerModel.LoadBitmap(imageManagerModel.NextImage(_files));
+            if(_files != null)
+            {
+                CurrentImageName = imageManagerModel.NextImage(_files);
+                DisplayedImage = imageManagerModel.LoadBitmap(imageManagerModel.NextImage(_files));
+            }
+
         }
 
         private void PrevImage(object obj)
         {
-            CurrentImageName = imageManagerModel.PrevImage(_files);
-            DisplayedImage = imageManagerModel.LoadBitmap(imageManagerModel.PrevImage(_files));
+            if (_files != null)
+            {
+                CurrentImageName = imageManagerModel.PrevImage(_files);
+                DisplayedImage = imageManagerModel.LoadBitmap(imageManagerModel.PrevImage(_files));
+            }
         }
 
+        private void ToggleSpreadsheet(object obj)
+        {
+            IsSpreadsheetVisible = !IsSpreadsheetVisible;
+
+            if (IsSpreadsheetVisible)
+            {
+                // [ON 상태] 스프레드시트를 보고 싶다!
+                // -> Cognex 화면(WindowsFormsHost)을 켜고, 로컬 이미지는 숨깁니다.
+                IsLiveMode = true;
+                IsLocalMode = false;
+
+                // (중요) Cognex 화면에 "격자 보여줘" 신호 보내기 (ShowGrid = true)
+                // Behavior가 이걸 감지하고 display.ShowGrid = true를 실행함
+            }
+            else
+            {
+                // [OFF 상태] 다시 이미지를 보고 싶다!
+                // -> Cognex 화면을 끄고, 로컬 이미지를 다시 보여줍니다.
+                IsLiveMode = false;
+                IsLocalMode = true;
+            }
+
+        }
 
         public MainViewModel()
         {
@@ -157,6 +221,7 @@ namespace InSight_Manager.ViewModel
             SelectFolderCommand = new RelayCommand(SelectFolder);
             NextImageCommand = new RelayCommand(NextImage);
             PrevImageCommand = new RelayCommand(PrevImage);
+            ToggleSpreadsheetCommand = new RelayCommand(ToggleSpreadsheet);
             OnConnect();
 
         }
