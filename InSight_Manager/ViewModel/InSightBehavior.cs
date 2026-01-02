@@ -25,7 +25,6 @@ namespace InSight_Manager.ViewModel // 네임스페이스는 프로젝트에 맞
         private static void OnShowSpreadsheetChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
 
-            //if (displayEdit == null) displayEdit = new CvsInSightDisplayEdit();
 
             if (System.ComponentModel.DesignerProperties.GetIsInDesignMode(d)) return;
 
@@ -37,8 +36,6 @@ namespace InSight_Manager.ViewModel // 네임스페이스는 프로젝트에 맞
                 {
                     // 스프레드시트 모드: 격자 켜고, 영상은 꺼버림 (확실하게 보이게)
                     display.ShowGrid = true;
-                    displayEdit = display.Edit;
-
                 }
                 else
                 {
@@ -64,6 +61,7 @@ namespace InSight_Manager.ViewModel // 네임스페이스는 프로젝트에 맞
                 // 새 카메라가 연결되면 화면에 꽂아줍니다.
                 // (단, 로컬 이미지를 보고 있을 때는 무시하도록 로직을 짤 수도 있습니다)
                 display.InSight = e.NewValue as CvsInSight;
+                display.ImageScale = 0.75;
             }
         }
 

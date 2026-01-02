@@ -1,9 +1,11 @@
-﻿using InSight_Inspection_Manager;
+﻿using Cognex.InSight;
+using InSight_Inspection_Manager;
 using InSight_Manager.Model;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
+using System.Security.RightsManagement;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -16,12 +18,10 @@ namespace InSight_Manager.ViewModel
 {
     public class MainViewModel: ViewModelBase
     {
-
-
-
         ConnectModel model = new ConnectModel();
         ImageManagerModel imageManagerModel = new ImageManagerModel();
         BrushConverter converter = new BrushConverter();
+        CvsInSight _isInSightSensor = new CvsInSight();
 
         private string _ipAddress = "127.0.0.1";
         private int port = 23;
@@ -145,9 +145,21 @@ namespace InSight_Manager.ViewModel
                 OnPropertyChanged();
             }
         }
+
+        public CvsInSight IsInSightSensor
+        {
+            get=> _isInSightSensor;
+            set
+            {
+                _isInSightSensor = value;
+                OnPropertyChanged();
+            }
+        }
+
+
         private void OnConnect()
         {
-            if(model.ConnectToEmulator(IpAddress))
+            if(model.ConnectToEmulator(IsInSightSensor,IpAddress))
             {
                 MessageBox.Show("Insight Connect Complete!");
                 ConnectionStatusText = "Online";
@@ -165,12 +177,13 @@ namespace InSight_Manager.ViewModel
         {
             SelectedFolderPath =  imageManagerModel.SelectFolder(SelectedFolderPath);
 
+
             _files = imageManagerModel.GetImageFiles(SelectedFolderPath);
 
             if(_files != null)
             {
                 CurrentImageName = imageManagerModel.Showiamge(_files);
-                DisplayedImage = imageManagerModel.LoadBitmap(imageManagerModel.Showiamge(_files));
+                DisplayedImage = imageManagerModel.LoadBitmap(CurrentImageName);
             }
         }
 
@@ -179,7 +192,7 @@ namespace InSight_Manager.ViewModel
             if(_files != null)
             {
                 CurrentImageName = imageManagerModel.NextImage(_files);
-                DisplayedImage = imageManagerModel.LoadBitmap(imageManagerModel.NextImage(_files));
+                DisplayedImage = imageManagerModel.LoadBitmap(CurrentImageName);
             }
 
         }
@@ -189,7 +202,7 @@ namespace InSight_Manager.ViewModel
             if (_files != null)
             {
                 CurrentImageName = imageManagerModel.PrevImage(_files);
-                DisplayedImage = imageManagerModel.LoadBitmap(imageManagerModel.PrevImage(_files));
+                DisplayedImage = imageManagerModel.LoadBitmap(CurrentImageName);
             }
         }
 
@@ -201,8 +214,7 @@ namespace InSight_Manager.ViewModel
             {
                 // [ON 상태] 스프레드시트를 보고 싶다!
                 // -> Cognex 화면(WindowsFormsHost)을 켜고, 로컬 이미지는 숨깁니다.
-                IsLiveMode = true;
-                IsLocalMode = false;
+                IsLocalMode = true;
 
                 // (중요) Cognex 화면에 "격자 보여줘" 신호 보내기 (ShowGrid = true)
                 // Behavior가 이걸 감지하고 display.ShowGrid = true를 실행함
@@ -211,11 +223,11 @@ namespace InSight_Manager.ViewModel
             {
                 // [OFF 상태] 다시 이미지를 보고 싶다!
                 // -> Cognex 화면을 끄고, 로컬 이미지를 다시 보여줍니다.
-                IsLiveMode = false;
                 IsLocalMode = true;
             }
 
         }
+
 
         public MainViewModel()
         {

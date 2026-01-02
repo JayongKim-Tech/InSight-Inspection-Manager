@@ -118,7 +118,7 @@
             <wf:WindowsFormsHost
                 localHelpers:InSightBehavior.ShowSpreadsheet="{Binding IsSpreadsheetVisible}"
                 localHelpers:InSightBehavior.SensorSource="{Binding IsInSightSensor}"
-                Visibility="{Binding IsLiveMode, Converter={StaticResource BooleanToVisibilityConverter}}">
+                Visibility="{Binding IsLocalMode, Converter={StaticResource BooleanToVisibilityConverter}}">
                 <cog:CvsInSightDisplay x:Name="cvsInSightDisplay1" />
             </wf:WindowsFormsHost>
 
