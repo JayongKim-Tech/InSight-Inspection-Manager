@@ -8,7 +8,7 @@ namespace InSight_Manager.ViewModel // 네임스페이스는 프로젝트에 맞
 {
     public static class InSightBehavior
     {
-
+        private static CvsInSightDisplayEdit displayEdit;
 
         #region SpreadSheet Control
 
@@ -24,6 +24,9 @@ namespace InSight_Manager.ViewModel // 네임스페이스는 프로젝트에 맞
 
         private static void OnShowSpreadsheetChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
+
+            //if (displayEdit == null) displayEdit = new CvsInSightDisplayEdit();
+
             if (System.ComponentModel.DesignerProperties.GetIsInDesignMode(d)) return;
 
             if (d is WindowsFormsHost host && host.Child is CvsInSightDisplay display)
@@ -34,13 +37,13 @@ namespace InSight_Manager.ViewModel // 네임스페이스는 프로젝트에 맞
                 {
                     // 스프레드시트 모드: 격자 켜고, 영상은 꺼버림 (확실하게 보이게)
                     display.ShowGrid = true;
-                    display.ShowCustomView = false;
+                    displayEdit = display.Edit;
+
                 }
                 else
                 {
                     // 라이브 모드: 격자 끄고, 영상 다시 켬
                     display.ShowGrid = false;
-                    display.ShowCustomView = true;
                 }
             }
         }

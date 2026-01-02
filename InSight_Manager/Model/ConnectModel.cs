@@ -9,6 +9,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace InSight_Manager.Model
 {
@@ -33,7 +34,7 @@ namespace InSight_Manager.Model
             catch(Exception ex)
 
             {
-                Debug.Write(ex);
+                MessageBox.Show($"{ex}");
                 return false;
             }
 

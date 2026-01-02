@@ -18,11 +18,12 @@ namespace InSight_Manager.ViewModel
     {
 
 
+
         ConnectModel model = new ConnectModel();
         ImageManagerModel imageManagerModel = new ImageManagerModel();
         BrushConverter converter = new BrushConverter();
 
-        private string _ipAddress = "127799.0.0.1";
+        private string _ipAddress = "127.0.0.1";
         private int port = 23;
         private string _status = "Null";
         private string _selectedFolderPath = null;
@@ -148,6 +149,7 @@ namespace InSight_Manager.ViewModel
         {
             if(model.ConnectToEmulator(IpAddress))
             {
+                MessageBox.Show("Insight Connect Complete!");
                 ConnectionStatusText = "Online";
                 ConnectionStatusColor = (Brush)converter.ConvertFromString("#00FF00");
             }
