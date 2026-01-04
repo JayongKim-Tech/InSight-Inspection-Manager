@@ -67,6 +67,33 @@
                 </Trigger>
             </Style.Triggers>
         </Style>
+
+        <Style x:Key="ToolbarBtnStyle" TargetType="Button">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="#E0E0E0"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="8,5"/>
+            <Setter Property="Margin" Value="2,0"/>
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" CornerRadius="3" BorderThickness="1" BorderBrush="Transparent">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#505050"/>
+                                <Setter Property="Cursor" Value="Hand"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter Property="Background" Value="#007ACC"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </Window.Resources>
 
     <Window.InputBindings>
@@ -78,6 +105,7 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="60"/>
+            <RowDefinition Height="40"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="80"/>
         </Grid.RowDefinitions>
@@ -89,18 +117,12 @@
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
-
                 <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
                     <Ellipse Width="12" Height="12" Fill="{Binding ConnectionStatusColor, FallbackValue=#FF0000}" Margin="0,0,10,0"/>
-                    <TextBlock Text="{Binding ConnectionStatusText, FallbackValue='Offline Mode'}"
-                               Foreground="#CCCCCC" FontSize="14" FontWeight="SemiBold"/>
+                    <TextBlock Text="{Binding ConnectionStatusText, FallbackValue='Offline Mode'}" Foreground="#CCCCCC" FontSize="14" FontWeight="SemiBold"/>
                 </StackPanel>
-
                 <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
-                    <TextBlock Text="{Binding SelectedFolderPath, FallbackValue='C:\Images\Inspection_2023'}"
-                               Foreground="#777777" VerticalAlignment="Center" Margin="0,0,15,0"
-                               FontStyle="Italic" MaxWidth="300" TextTrimming="CharacterEllipsis"/>
-
+                    <TextBlock Text="{Binding SelectedFolderPath, FallbackValue='C:\Images\Inspection_2023'}" Foreground="#777777" VerticalAlignment="Center" Margin="0,0,15,0" FontStyle="Italic" MaxWidth="300" TextTrimming="CharacterEllipsis"/>
                     <Button Command="{Binding SelectFolderCommand}" Style="{StaticResource FolderBtnStyle}">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="📂" Margin="0,0,8,0"/>
@@ -111,68 +133,76 @@
             </Grid>
         </Border>
 
-        <Grid Grid.Row="1" Background="Black">
-            <Image Source="{Binding DisplayedImage}" Stretch="Uniform"
-                   Visibility="{Binding IsLocalMode, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+        <Border Grid.Row="1" Background="#333337" BorderBrush="#3F3F46" BorderThickness="0,1,0,1" Padding="10,0">
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                <Button Style="{StaticResource ToolbarBtnStyle}" ToolTip="New Job">
+                    <TextBlock Text="📄"/>
+                </Button>
+                <Button Style="{StaticResource ToolbarBtnStyle}" ToolTip="Open Job">
+                    <TextBlock Text="📂"/>
+                </Button>
+                <Button Style="{StaticResource ToolbarBtnStyle}" ToolTip="Save Job">
+                    <TextBlock Text="💾"/>
+                </Button>
 
+                <Rectangle Width="1" Height="20" Fill="#555555" Margin="5,0"/>
+
+                <Button Style="{StaticResource ToolbarBtnStyle}" ToolTip="Cut">
+                    <TextBlock Text="✂"/>
+                </Button>
+                <Button Style="{StaticResource ToolbarBtnStyle}" ToolTip="Copy">
+                    <TextBlock Text="Cx"/>
+                </Button>
+                <Button Style="{StaticResource ToolbarBtnStyle}" ToolTip="Paste">
+                    <TextBlock Text="📋"/>
+                </Button>
+
+                <Rectangle Width="1" Height="20" Fill="#555555" Margin="5,0"/>
+
+                <Button Style="{StaticResource ToolbarBtnStyle}" ToolTip="Zoom In"
+                    Command="{Binding ZoomInCommand}">
+                    <TextBlock Text="➕"/>
+                </Button>
+                <Button Style="{StaticResource ToolbarBtnStyle}" ToolTip="Zoom Out"
+                    Command="{Binding ZoomOutCommand}">
+                    <TextBlock Text="➖"/>
+                </Button>
+                <Button Style="{StaticResource ToolbarBtnStyle}" ToolTip="Zoom Fit"
+                    Command="{Binding ZoomFitCommand}">
+                    <TextBlock Text="⛶"/>
+                </Button>
+
+                <Rectangle Width="1" Height="20" Fill="#555555" Margin="5,0"/>
+
+                <Button Style="{StaticResource ToolbarBtnStyle}" ToolTip="Manual Trigger">
+                    <TextBlock Text="⚡"/>
+                </Button>
+                <Button Style="{StaticResource ToolbarBtnStyle}" ToolTip="Live Mode">
+                    <TextBlock Text="🎥"/>
+                </Button>
+                <Rectangle Width="1" Height="20" Fill="#555555" Margin="5,0"/>
+
+                <Button Style="{StaticResource ToolbarBtnStyle}"
+                        ToolTip="Show/Hide Spreadsheet"
+                        Command="{Binding ToggleSpreadsheetCommand}">
+                    <TextBlock Text="▦" FontSize="18" VerticalAlignment="Center"/>
+                </Button>
+
+            </StackPanel>
+        </Border>
+
+        <Grid Grid.Row="2" Background="Black">
             <wf:WindowsFormsHost
-                localHelpers:InSightBehavior.ShowSpreadsheet="{Binding IsSpreadsheetVisible}"
-                localHelpers:InSightBehavior.SensorSource="{Binding IsInSightSensor}"
-                Visibility="{Binding IsLocalMode, Converter={StaticResource BooleanToVisibilityConverter}}">
+             localHelpers:InSightBehavior.Controller="{Binding DisplayController, Mode=OneWayToSource}"
+             localHelpers:InSightBehavior.SensorSource="{Binding IsInSightSensor}"
+             >
                 <cog:CvsInSightDisplay x:Name="cvsInSightDisplay1" />
             </wf:WindowsFormsHost>
 
-            <TextBlock Text="No Image Loaded"
-                       Visibility="{Binding IsImageEmpty, Converter={StaticResource BooleanToVisibilityConverter}, FallbackValue=Collapsed}"
-                       Foreground="#555555" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="20"/>
-
-            <Button Grid.Column="0" Style="{StaticResource NavBtnStyle}" Content="◀"
-                    HorizontalAlignment="Left" Margin="20,0"
-                    Command="{Binding PrevImageCommand}"
-                    Visibility="{Binding IsLocalMode, Converter={StaticResource BooleanToVisibilityConverter}}"/>
-
-            <Button Grid.Column="1" Style="{StaticResource NavBtnStyle}" Content="▶"
-                    HorizontalAlignment="Right" Margin="20,0"
-                    Command="{Binding NextImageCommand}"
-                    Visibility="{Binding IsLocalMode, Converter={StaticResource BooleanToVisibilityConverter}}"/>
-
-            <Border VerticalAlignment="Bottom" HorizontalAlignment="Center"
-                    Background="#88000000" CornerRadius="10" Padding="15,5" Margin="0,0,0,20">
-                <TextBlock Text="{Binding CurrentImageName, FallbackValue='img_sample_001.jpg'}"
-                           Foreground="White" FontSize="16"/>
-            </Border>
         </Grid>
 
-        <Border Grid.Row="2" Background="#252526" BorderBrush="#3F3F46" BorderThickness="0,1,0,0" Padding="20,10">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
-
-                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                    <TextBlock Text="Result:" Foreground="#AAAAAA" FontSize="18" Margin="0,0,10,0"/>
-                    <TextBlock Text="{Binding InspectionResult, FallbackValue=OK}"
-                               Foreground="{Binding ResultColor, FallbackValue=#00FF00}"
-                               FontSize="32" FontWeight="Bold"/>
-                </StackPanel>
-
-
-                <StackPanel Grid.Column="2" Orientation="Horizontal">
-                    <Button Content="Spreadsheet On/Off" Padding="20,10"
-                            Command="{Binding ToggleSpreadsheetCommand}"
-                            Background="#68217A" Foreground="White" BorderThickness="0"
-                            Margin="0,0,10,0"/>
-
-                    <Button Content="Manual Trigger" Padding="20,10"
-                            Background="#007ACC" Foreground="White" BorderThickness="0"
-                            Margin="0,0,10,0"/>
-
-                    <Button Content="Force NG Reset" Padding="20,10"
-                            Background="#C50000" Foreground="White" BorderThickness="0"/>
-                </StackPanel>
-            </Grid>
+        <Border Grid.Row="3" Background="#252526" BorderBrush="#3F3F46" BorderThickness="0,1,0,0" Padding="20,10">
         </Border>
+
     </Grid>
 </Window>

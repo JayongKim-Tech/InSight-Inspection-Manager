@@ -8,42 +8,15 @@ namespace InSight_Manager.ViewModel // 네임스페이스는 프로젝트에 맞
 {
     public static class InSightBehavior
     {
-        private static CvsInSightDisplayEdit displayEdit;
 
-        #region SpreadSheet Control
+        #region Controller
 
-        public static bool GetShowSpreadsheet(DependencyObject obj) => (bool)obj.GetValue(ShowSpreadsheetProperty);
-        public static void SetShowSpreadsheet(DependencyObject obj, bool value) => obj.SetValue(ShowSpreadsheetProperty, value);
+        public static IDisplayController GetController(DependencyObject obj) => (IDisplayController)obj.GetValue(ControllerProperty);
+        public static void SetController(DependencyObject obj, IDisplayController value) => obj.SetValue(ControllerProperty, value);
 
-        public static readonly DependencyProperty ShowSpreadsheetProperty =
-            DependencyProperty.RegisterAttached(
-                "ShowSpreadsheet",
-                typeof(bool),
-                typeof(InSightBehavior),
-                new PropertyMetadata(false, OnShowSpreadsheetChanged));
-
-        private static void OnShowSpreadsheetChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-
-
-            if (System.ComponentModel.DesignerProperties.GetIsInDesignMode(d)) return;
-
-            if (d is WindowsFormsHost host && host.Child is CvsInSightDisplay display)
-            {
-                bool show = (bool)e.NewValue;
-
-                if (show)
-                {
-                    // 스프레드시트 모드: 격자 켜고, 영상은 꺼버림 (확실하게 보이게)
-                    display.ShowGrid = true;
-                }
-                else
-                {
-                    // 라이브 모드: 격자 끄고, 영상 다시 켬
-                    display.ShowGrid = false;
-                }
-            }
-        }
+        public static readonly DependencyProperty ControllerProperty =
+            DependencyProperty.RegisterAttached("Controller", typeof(IDisplayController), typeof(InSightBehavior),
+                new PropertyMetadata(null));
 
         #endregion
 
@@ -58,14 +31,37 @@ namespace InSight_Manager.ViewModel // 네임스페이스는 프로젝트에 맞
         {
             if (d is WindowsFormsHost host && host.Child is CvsInSightDisplay display)
             {
-                // 새 카메라가 연결되면 화면에 꽂아줍니다.
-                // (단, 로컬 이미지를 보고 있을 때는 무시하도록 로직을 짤 수도 있습니다)
+
                 display.InSight = e.NewValue as CvsInSight;
-                display.ImageScale = 0.75;
+
+                var viewModelController = GetController(host);
+                if (viewModelController == null)
+                {
+                    // 즉석에서 구현체(Wrapper)를 만들어서 보냄
+                    SetController(host, new DisplayControllerWrapper(display));
+                }
+
+
+
             }
         }
-
         #endregion
 
+
+        private class DisplayControllerWrapper : IDisplayController
+        {
+            private readonly CvsInSightDisplay _display;
+            public DisplayControllerWrapper(CvsInSightDisplay display) => _display = display;
+
+            public void SetZoomIn(double scale) => _display.ImageScale = scale + 0.1;
+            public void SetZoomOut(double scale) => _display.ImageScale = scale - 0.1;
+            public void SetGrid(bool show) { _display.ShowGrid = show; _display.Invalidate(); }
+            public void SetGraphics(bool show) => _display.ShowGraphics = show;
+            public void FitImage() => _display.ImageScale = 0.75;
+        }
+
+
     }
+
+
 }

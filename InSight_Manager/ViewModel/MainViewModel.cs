@@ -23,13 +23,13 @@ namespace InSight_Manager.ViewModel
         BrushConverter converter = new BrushConverter();
         CvsInSight _isInSightSensor = new CvsInSight();
 
+        public bool _gridStatus = false;
+
         private string _ipAddress = "127.0.0.1";
         private int port = 23;
         private string _status = "Null";
         private string _selectedFolderPath = null;
         private string _fileName = null;
-
-        private bool _isSpreadsheetVisible = false;
 
         private bool _isLocalMode = true;
         private bool _isLiveMode = false;
@@ -41,13 +41,25 @@ namespace InSight_Manager.ViewModel
         private string _connectStatus = "Offline";
         private Brush _connectStatusColor;
 
+
+
         public ICommand ConnectCommand { get; }
         public ICommand SelectFolderCommand { get; }
         public ICommand NextImageCommand { get; }
         public ICommand PrevImageCommand { get; }
 
         public ICommand ToggleSpreadsheetCommand { get; }
+        public ICommand ZoomInCommand { get; }
+        public ICommand ZoomOutCommand { get; }
+        public ICommand ZoomFitCommand { get; }
 
+        private IDisplayController _displayController;
+
+        public IDisplayController DisplayController
+        {
+            get => _displayController;
+            set { _displayController = value; OnPropertyChanged(); }
+        }
 
         public bool IsLiveMode
         {
@@ -117,15 +129,7 @@ namespace InSight_Manager.ViewModel
             }
         }
 
-        public bool IsSpreadsheetVisible
-        {
-            get => _isSpreadsheetVisible;
-            set
-            {
-                _isSpreadsheetVisible = value;
-                OnPropertyChanged();
-            }
-        }
+
         public Brush ConnectionStatusColor
         {
             get => _connectStatusColor;
@@ -208,23 +212,8 @@ namespace InSight_Manager.ViewModel
 
         private void ToggleSpreadsheet(object obj)
         {
-            IsSpreadsheetVisible = !IsSpreadsheetVisible;
-
-            if (IsSpreadsheetVisible)
-            {
-                // [ON 상태] 스프레드시트를 보고 싶다!
-                // -> Cognex 화면(WindowsFormsHost)을 켜고, 로컬 이미지는 숨깁니다.
-                IsLocalMode = true;
-
-                // (중요) Cognex 화면에 "격자 보여줘" 신호 보내기 (ShowGrid = true)
-                // Behavior가 이걸 감지하고 display.ShowGrid = true를 실행함
-            }
-            else
-            {
-                // [OFF 상태] 다시 이미지를 보고 싶다!
-                // -> Cognex 화면을 끄고, 로컬 이미지를 다시 보여줍니다.
-                IsLocalMode = true;
-            }
+            _gridStatus = !_gridStatus;
+            DisplayController?.SetGrid(_gridStatus);
 
         }
 
@@ -236,6 +225,7 @@ namespace InSight_Manager.ViewModel
             NextImageCommand = new RelayCommand(NextImage);
             PrevImageCommand = new RelayCommand(PrevImage);
             ToggleSpreadsheetCommand = new RelayCommand(ToggleSpreadsheet);
+            //ZoomFitCommand = new RelayCommand();
             OnConnect();
 
         }
