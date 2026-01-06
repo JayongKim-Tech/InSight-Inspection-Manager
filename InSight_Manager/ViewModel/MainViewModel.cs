@@ -1,13 +1,16 @@
 ﻿using Cognex.InSight;
+using Cognex.InSight.Controls.Display.EZBuilder;
 using InSight_Inspection_Manager;
 using InSight_Manager.Model;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
+using System.Runtime.Remoting.Proxies;
 using System.Security.RightsManagement;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Documents;
 using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -20,26 +23,30 @@ namespace InSight_Manager.ViewModel
     {
         ConnectModel model = new ConnectModel();
         ImageManagerModel imageManagerModel = new ImageManagerModel();
+        JobFileManagerModel jobFileManagerModel = new JobFileManagerModel();
         BrushConverter converter = new BrushConverter();
         CvsInSight _isInSightSensor = new CvsInSight();
 
-        public bool _gridStatus = false;
+        public bool _gridStatus, _customView, _graphicView, _onlineStatus = false;
+
+
+        private string jobFilepath;
 
         private string _ipAddress = "127.0.0.1";
-        private int port = 23;
         private string _status = "Null";
         private string _selectedFolderPath = null;
-        private string _fileName = null;
+        private string _fileName;
+        private string _isOnlineText = "Offline";
 
         private bool _isLocalMode = true;
         private bool _isLiveMode = false;
 
         private List<string> _files;
 
-        private BitmapImage _image = null;
+        private BitmapImage _image;
 
         private string _connectStatus = "Offline";
-        private Brush _connectStatusColor;
+        private Brush _isOnline = Brushes.Red;
 
 
 
@@ -52,6 +59,16 @@ namespace InSight_Manager.ViewModel
         public ICommand ZoomInCommand { get; }
         public ICommand ZoomOutCommand { get; }
         public ICommand ZoomFitCommand { get; }
+
+        public ICommand SaveJobCommand { get; }
+        public ICommand OpenJobCommand { get; }
+        public ICommand NewJobCommand { get; }
+
+        public ICommand ToggleCustomViewCommand { get; }
+        public ICommand ToggleGraphicsCommand { get; }
+        public ICommand ToggleOnlineCommand { get; }
+
+
 
         private IDisplayController _displayController;
 
@@ -129,13 +146,22 @@ namespace InSight_Manager.ViewModel
             }
         }
 
-
-        public Brush ConnectionStatusColor
+        public string IsOnlineText
         {
-            get => _connectStatusColor;
+            get => _isOnlineText;
             set
             {
-                _connectStatusColor = value;
+                _isOnlineText = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public Brush IsOnline
+        {
+            get => _isOnline;
+            set
+            {
+                _isOnline = value;
                 OnPropertyChanged();
             }
         }
@@ -161,18 +187,18 @@ namespace InSight_Manager.ViewModel
         }
 
 
+
         private void OnConnect()
         {
             if(model.ConnectToEmulator(IsInSightSensor,IpAddress))
             {
                 MessageBox.Show("Insight Connect Complete!");
-                ConnectionStatusText = "Online";
-                ConnectionStatusColor = (Brush)converter.ConvertFromString("#00FF00");
+                ConnectionStatusText = "Connected";
+
             }
             else
             {
-                ConnectionStatusText = "Offline";
-                ConnectionStatusColor = (Brush)converter.ConvertFromString("#FF0000");
+                ConnectionStatusText = "Disconnected";
             }
 
         }
@@ -217,6 +243,86 @@ namespace InSight_Manager.ViewModel
 
         }
 
+        private void ZoomFit(object obj)
+        {
+            DisplayController?.FitImage();
+        }
+
+        private void ZoomIn(object obj)
+        {
+            DisplayController?.SetZoomIn(0.05);
+        }
+
+        private void ZoomOut(object obj)
+        {
+            DisplayController?.SetZoomOut(0.05);
+        }
+
+
+        private void SaveJob(object obj)
+        {
+
+            DisplayController?.SaveJob(jobFileManagerModel.SaveJobDlg());
+        }
+
+        private void OpenJob(object obj)
+        {
+
+            DisplayController?.OpenJob(jobFileManagerModel.OpenJobDlg());
+        }
+
+        private void NewJob(object obj)
+        {
+            var result = System.Windows.MessageBox.Show(
+                "Do you want to save the changes?",   // 메시지 내용
+                "Check Please",                     // 창 제목
+                System.Windows.MessageBoxButton.YesNo,  // 버튼 종류 (Yes/No)
+                System.Windows.MessageBoxImage.Question // 아이콘 (물음표)
+            );
+
+            // 2. 선택 결과 bool로 변환 (Yes를 누르면 true, 아니면 false)
+            bool isConfirmed = (result == System.Windows.MessageBoxResult.Yes);
+
+            if (isConfirmed) jobFileManagerModel.SaveJobDlg();
+            else DisplayController?.NewJob();
+
+        }
+
+        private void ShowCustomView(object obj)
+        {
+            _customView = !_customView;
+
+            DisplayController?.IsCustomView(_customView);
+        }
+
+        private void ShowGraphicView(object obj)
+        {
+            _graphicView = !_graphicView;
+            DisplayController?.IsGraphicView(_graphicView);
+        }
+
+        private void SetOnline(object obj)
+        {
+            _onlineStatus = !_onlineStatus;
+
+            if (_onlineStatus)
+            {
+                IsOnlineText = "Online";
+                IsOnline = Brushes.Green;
+            }
+
+
+            else
+            {
+                IsOnlineText = "Offline";
+                IsOnline = Brushes.Red;
+            }
+
+
+            DisplayController?.IsOnline(_onlineStatus);
+
+
+        }
 
         public MainViewModel()
         {
@@ -225,9 +331,16 @@ namespace InSight_Manager.ViewModel
             NextImageCommand = new RelayCommand(NextImage);
             PrevImageCommand = new RelayCommand(PrevImage);
             ToggleSpreadsheetCommand = new RelayCommand(ToggleSpreadsheet);
-            //ZoomFitCommand = new RelayCommand();
+            ZoomFitCommand = new RelayCommand(ZoomFit);
+            ZoomInCommand = new RelayCommand(ZoomIn);
+            ZoomOutCommand = new RelayCommand(ZoomOut);
+            SaveJobCommand = new RelayCommand(SaveJob);
+            OpenJobCommand = new RelayCommand(OpenJob);
+            NewJobCommand = new RelayCommand(NewJob);
+            ToggleCustomViewCommand = new RelayCommand(ShowCustomView);
+            ToggleGraphicsCommand = new RelayCommand(ShowGraphicView);
+            ToggleOnlineCommand = new RelayCommand(SetOnline);
             OnConnect();
-
         }
 
 

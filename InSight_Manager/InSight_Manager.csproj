@@ -68,6 +68,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Model\ImageManagerModel.cs" />
+    <Compile Include="Model\JobFileManagerModel.cs" />
     <Compile Include="ViewModel\IDisplayController.cs" />
     <Compile Include="ViewModel\InSightBehavior.cs" />
     <Compile Include="View\MainWindow.xaml.cs">

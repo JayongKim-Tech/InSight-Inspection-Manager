@@ -13,6 +13,16 @@ namespace InSight_Manager.ViewModel
         void SetGrid(bool show);
         void SetGraphics(bool show);
         void FitImage();
+        void SaveJob(string filename);
+        void OpenJob(string filename);
+        void NewJob();
+
+        void IsCustomView(bool show);
+        void IsGraphicView(bool show);
+        void IsOnline(bool online);
+
+
+
 
     }
 }

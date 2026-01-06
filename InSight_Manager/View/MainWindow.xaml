@@ -135,13 +135,16 @@
 
         <Border Grid.Row="1" Background="#333337" BorderBrush="#3F3F46" BorderThickness="0,1,0,1" Padding="10,0">
             <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                <Button Style="{StaticResource ToolbarBtnStyle}" ToolTip="New Job">
+                <Button Style="{StaticResource ToolbarBtnStyle}" ToolTip="New Job"
+                        Command="{Binding NewJobCommand}">
                     <TextBlock Text="📄"/>
                 </Button>
-                <Button Style="{StaticResource ToolbarBtnStyle}" ToolTip="Open Job">
+                <Button Style="{StaticResource ToolbarBtnStyle}" ToolTip="Open Job"
+                        Command="{Binding OpenJobCommand}">
                     <TextBlock Text="📂"/>
                 </Button>
-                <Button Style="{StaticResource ToolbarBtnStyle}" ToolTip="Save Job">
+                <Button Style="{StaticResource ToolbarBtnStyle}" ToolTip="Save Job"
+                        Command="{Binding SaveJobCommand}">
                     <TextBlock Text="💾"/>
                 </Button>
 
@@ -186,6 +189,32 @@
                         ToolTip="Show/Hide Spreadsheet"
                         Command="{Binding ToggleSpreadsheetCommand}">
                     <TextBlock Text="▦" FontSize="18" VerticalAlignment="Center"/>
+                </Button>
+
+                <Rectangle Width="1" Height="20" Fill="#555555" Margin="5,0"/>
+
+                <Button Style="{StaticResource ToolbarBtnStyle}"
+                    ToolTip="Custom View"
+                    Command="{Binding ToggleCustomViewCommand}">
+                    <TextBlock Text="👁️"/>
+                </Button>
+
+                <Button Style="{StaticResource ToolbarBtnStyle}"
+                    ToolTip="Show/Hide Graphics"
+                    Command="{Binding ToggleGraphicsCommand}">
+                    <TextBlock Text="🖼️"/>
+                </Button>
+
+                <Rectangle Width="1" Height="20" Fill="#555555" Margin="5,0"/>
+
+                <Button Style="{StaticResource ToolbarBtnStyle}"
+                    ToolTip="Toggle Online/Offline"
+                    Command="{Binding ToggleOnlineCommand}">
+                    <StackPanel Orientation="Horizontal">
+                        <Ellipse Width="10" Height="10" Margin="0,0,5,0"
+                            Fill="{Binding IsOnline, FallbackValue=Gray}"/>
+                        <TextBlock Text="{Binding IsOnlineText, FallbackValue='Offline'}"/>
+                    </StackPanel>
                 </Button>
 
             </StackPanel>
