@@ -4,7 +4,6 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:InSight_Manager.View"
-        xmlns:localHelpers="clr-namespace:InSight_Manager.ViewModel"
         xmlns:wf="clr-namespace:System.Windows.Forms.Integration;assembly=WindowsFormsIntegration"
         xmlns:cog="clr-namespace:Cognex.InSight.Controls.Display;assembly=Cognex.InSight.Controls.Display"
         mc:Ignorable="d"
@@ -98,7 +97,6 @@
 
     <Window.InputBindings>
         <KeyBinding Key="Left" Command="{Binding PrevImageCommand}"/>
-
         <KeyBinding Key="Right" Command="{Binding NextImageCommand}"/>
     </Window.InputBindings>
 
@@ -135,16 +133,17 @@
 
         <Border Grid.Row="1" Background="#333337" BorderBrush="#3F3F46" BorderThickness="0,1,0,1" Padding="10,0">
             <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+
                 <Button Style="{StaticResource ToolbarBtnStyle}" ToolTip="New Job"
-                        Command="{Binding NewJobCommand}">
+                        Command="{Binding FileVM.NewJobCommand}">
                     <TextBlock Text="📄"/>
                 </Button>
                 <Button Style="{StaticResource ToolbarBtnStyle}" ToolTip="Open Job"
-                        Command="{Binding OpenJobCommand}">
+                        Command="{Binding FileVM.OpenJobCommand}">
                     <TextBlock Text="📂"/>
                 </Button>
                 <Button Style="{StaticResource ToolbarBtnStyle}" ToolTip="Save Job"
-                        Command="{Binding SaveJobCommand}">
+                        Command="{Binding FileVM.SaveJobCommand}">
                     <TextBlock Text="💾"/>
                 </Button>
 
@@ -163,15 +162,15 @@
                 <Rectangle Width="1" Height="20" Fill="#555555" Margin="5,0"/>
 
                 <Button Style="{StaticResource ToolbarBtnStyle}" ToolTip="Zoom In"
-                    Command="{Binding ZoomInCommand}">
+                        Command="{Binding DisplayVM.ZoomInCommand}">
                     <TextBlock Text="➕"/>
                 </Button>
                 <Button Style="{StaticResource ToolbarBtnStyle}" ToolTip="Zoom Out"
-                    Command="{Binding ZoomOutCommand}">
+                        Command="{Binding DisplayVM.ZoomOutCommand}">
                     <TextBlock Text="➖"/>
                 </Button>
                 <Button Style="{StaticResource ToolbarBtnStyle}" ToolTip="Zoom Fit"
-                    Command="{Binding ZoomFitCommand}">
+                        Command="{Binding DisplayVM.ZoomFitCommand}">
                     <TextBlock Text="⛶"/>
                 </Button>
 
@@ -183,38 +182,53 @@
                 <Button Style="{StaticResource ToolbarBtnStyle}" ToolTip="Live Mode">
                     <TextBlock Text="🎥"/>
                 </Button>
+
                 <Rectangle Width="1" Height="20" Fill="#555555" Margin="5,0"/>
 
                 <Button Style="{StaticResource ToolbarBtnStyle}"
                         ToolTip="Show/Hide Spreadsheet"
-                        Command="{Binding ToggleSpreadsheetCommand}">
+                        Command="{Binding DisplayVM.ToggleSpreadsheetCommand}">
                     <TextBlock Text="▦" FontSize="18" VerticalAlignment="Center"/>
                 </Button>
 
                 <Rectangle Width="1" Height="20" Fill="#555555" Margin="5,0"/>
 
                 <Button Style="{StaticResource ToolbarBtnStyle}"
-                    ToolTip="Custom View"
-                    Command="{Binding ToggleCustomViewCommand}">
+                        ToolTip="Custom View"
+                        Command="{Binding DisplayVM.ToggleCustomViewCommand}">
                     <TextBlock Text="👁️"/>
                 </Button>
-
                 <Button Style="{StaticResource ToolbarBtnStyle}"
-                    ToolTip="Show/Hide Graphics"
-                    Command="{Binding ToggleGraphicsCommand}">
+                        ToolTip="Show/Hide Graphics"
+                        Command="{Binding DisplayVM.ToggleGraphicsCommand}">
                     <TextBlock Text="🖼️"/>
                 </Button>
 
                 <Rectangle Width="1" Height="20" Fill="#555555" Margin="5,0"/>
 
                 <Button Style="{StaticResource ToolbarBtnStyle}"
-                    ToolTip="Toggle Online/Offline"
-                    Command="{Binding ToggleOnlineCommand}">
+                        ToolTip="Toggle Online/Offline"
+                        Command="{Binding ToggleOnlineCommand}">
                     <StackPanel Orientation="Horizontal">
                         <Ellipse Width="10" Height="10" Margin="0,0,5,0"
-                            Fill="{Binding IsOnline, FallbackValue=Gray}"/>
+                                 Fill="{Binding IsOnline, FallbackValue=Gray}"/>
                         <TextBlock Text="{Binding IsOnlineText, FallbackValue='Offline'}"/>
                     </StackPanel>
+                </Button>
+
+                <Rectangle Width="1" Height="20" Fill="#555555" Margin="5,0"/>
+
+
+                <Button Style="{StaticResource ToolbarBtnStyle}"
+                    ToolTip="Record Playback Options"
+                    Command="{Binding DisplayVM.ShowRecordOptionCommand}">
+                    <TextBlock Text="⚙️"/>
+                </Button>
+
+                <Button Style="{StaticResource ToolbarBtnStyle}"
+                    ToolTip="Show/Hide Filmstrip (Slide)"
+                    Command="{Binding DisplayVM.ToggleFilmstripCommand}">
+                    <TextBlock Text="🎞️"/>
                 </Button>
 
             </StackPanel>
@@ -222,16 +236,62 @@
 
         <Grid Grid.Row="2" Background="Black">
             <wf:WindowsFormsHost
-             localHelpers:InSightBehavior.Controller="{Binding DisplayController, Mode=OneWayToSource}"
-             localHelpers:InSightBehavior.SensorSource="{Binding IsInSightSensor}"
-             >
+             local:InSightBehavior.Controller="{Binding DisplayController, Mode=OneWayToSource}"
+             local:InSightBehavior.SensorSource="{Binding IsInSightSensor}">
                 <cog:CvsInSightDisplay x:Name="cvsInSightDisplay1" />
             </wf:WindowsFormsHost>
+
+            <ListBox VerticalAlignment="Bottom" Height="110"
+             Background="#99000000" BorderThickness="0"
+             ScrollViewer.HorizontalScrollBarVisibility="Auto"
+             ScrollViewer.VerticalScrollBarVisibility="Disabled"
+             ItemsSource="{Binding FilmstripImages}"
+             SelectedItem="{Binding SelectedFilmstripImage}">
+
+                <ListBox.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Orientation="Horizontal"/>
+                    </ItemsPanelTemplate>
+                </ListBox.ItemsPanel>
+
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <Border BorderBrush="#555555" BorderThickness="1" Margin="2" CornerRadius="2">
+                            <Image Source="{Binding}" Height="90" Stretch="Uniform"/>
+                        </Border>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+
+                <ListBox.ItemContainerStyle>
+                    <Style TargetType="ListBoxItem">
+                        <Setter Property="Padding" Value="0"/>
+                        <Setter Property="Margin" Value="0"/>
+                        <Setter Property="BorderThickness" Value="0"/>
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="ListBoxItem">
+                                    <Border x:Name="bd" BorderThickness="2" BorderBrush="Transparent" Margin="2">
+                                        <ContentPresenter/>
+                                    </Border>
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="IsSelected" Value="True">
+                                            <Setter TargetName="bd" Property="BorderBrush" Value="#007ACC"/>
+                                            <Setter TargetName="bd" Property="Background" Value="#33007ACC"/>
+                                        </Trigger>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter TargetName="bd" Property="BorderBrush" Value="#888888"/>
+                                        </Trigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </ListBox.ItemContainerStyle>
+            </ListBox>
 
         </Grid>
 
         <Border Grid.Row="3" Background="#252526" BorderBrush="#3F3F46" BorderThickness="0,1,0,0" Padding="20,10">
         </Border>
-
     </Grid>
 </Window>

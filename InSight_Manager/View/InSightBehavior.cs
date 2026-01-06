@@ -1,11 +1,12 @@
 ﻿using Cognex.InSight;
 using Cognex.InSight.Controls.Display;
+using InSight_Manager.View;
 using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Forms.Integration;
 using System.Windows.Media.Imaging;
 
-namespace InSight_Manager.ViewModel // 네임스페이스는 프로젝트에 맞게 수정
+namespace InSight_Manager.View // 네임스페이스는 프로젝트에 맞게 수정
 {
     public static class InSightBehavior
     {
@@ -51,7 +52,6 @@ namespace InSight_Manager.ViewModel // 네임스페이스는 프로젝트에 맞
         private class DisplayControllerWrapper : IDisplayController
         {
             private readonly CvsInSightDisplay _display;
-            private readonly CvsInSight insight;
             public DisplayControllerWrapper(CvsInSightDisplay display, CvsInSight insight)
             {
                 _display = display;
@@ -76,6 +76,26 @@ namespace InSight_Manager.ViewModel // 네임스페이스는 프로젝트에 맞
             public void IsGraphicView(bool show) => _display.ShowGraphics = show;
 
             public void IsOnline(bool online) => _display.SoftOnline = online;
+
+            //public void SetFilmstrip(bool show) => _display.InSight.Sensor.
+
+
+             //★ [신규 기능 2] 레코드 재생 옵션(설정창)
+            //public void ShowRecordOptions()
+            //{
+            //    if (_display.InSight != null)
+            //    {
+            //        // "Record/Playback Options" 다이얼로그를 띄우는 네이티브 명령어
+            //        try
+            //        {
+            //        }
+            //        catch
+            //        {
+            //            // 만약 Dialogs 접근이 안되면 Native Mode로 시도
+            //            System.Windows.MessageBox.Show("레코드 옵션창을 엽니다.");
+            //        }
+            //    }
+            //}
 
         }
 

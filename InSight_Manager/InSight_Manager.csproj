@@ -69,8 +69,10 @@
     </ApplicationDefinition>
     <Compile Include="Model\ImageManagerModel.cs" />
     <Compile Include="Model\JobFileManagerModel.cs" />
-    <Compile Include="ViewModel\IDisplayController.cs" />
-    <Compile Include="ViewModel\InSightBehavior.cs" />
+    <Compile Include="ViewModel\DisplayViewModel.cs" />
+    <Compile Include="ViewModel\FileViewModel.cs" />
+    <Compile Include="View\IDisplayController.cs" />
+    <Compile Include="View\InSightBehavior.cs" />
     <Compile Include="View\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
     </Compile>
@@ -115,8 +117,6 @@
       <SubType>Designer</SubType>
     </Page>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Helpers\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

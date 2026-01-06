@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace InSight_Manager.ViewModel
+namespace InSight_Manager.View
 {
     public interface IDisplayController
     {
@@ -21,7 +21,8 @@ namespace InSight_Manager.ViewModel
         void IsGraphicView(bool show);
         void IsOnline(bool online);
 
-
+        //void SetFilmstrip(bool show);      // 하단 슬라이드 (필름스트립)
+        //void ShowRecordOptions();          // 레코드 옵션 창 띄우기
 
 
     }
