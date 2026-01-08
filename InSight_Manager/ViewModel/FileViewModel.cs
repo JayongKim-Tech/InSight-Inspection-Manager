@@ -19,6 +19,8 @@ namespace InSight_Manager.ViewModel
         private ObservableCollection<string> _filmstripImages = new ObservableCollection<string>();
 
         public ObservableCollection<string> FilmstripImages
+
+
         {
             get => _filmstripImages;
             set
