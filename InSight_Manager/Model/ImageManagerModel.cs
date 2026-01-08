@@ -134,7 +134,6 @@ namespace InSight_Manager.Model
         {
             if (string.IsNullOrEmpty(folderPath) || !Directory.Exists(folderPath)) return;
 
-            // 1. 기존 리스트 비우기 (UI 스레드)
             FilmstripImages.Clear();
 
             // 2. 파일 목록을 가져오는 작업은 무거울 수 있으니 비동기로 진행
