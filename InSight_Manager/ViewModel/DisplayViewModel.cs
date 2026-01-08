@@ -7,13 +7,17 @@ namespace InSight_Manager.ViewModel
 {
     public class DisplayViewModel : ViewModelBase
     {
+
         // 리모컨 (메인에서 받아올 것임)
         private IDisplayController _displayController;
+
         public IDisplayController DisplayController
         {
             get { return _displayController; }
             set { _displayController = value; OnPropertyChanged(); }
         }
+
+
 
         // 상태 변수 (기존 이름 그대로)
         public bool _gridStatus = false;
@@ -73,5 +77,8 @@ namespace InSight_Manager.ViewModel
             _graphicView = !_graphicView;
             DisplayController?.IsGraphicView(_graphicView); // 리모컨 함수명 유지
         }
+
+
+
     }
 }

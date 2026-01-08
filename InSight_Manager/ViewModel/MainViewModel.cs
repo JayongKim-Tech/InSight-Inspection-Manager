@@ -16,6 +16,7 @@ namespace InSight_Manager.ViewModel
         public DisplayViewModel DisplayVM { get; set; } = new DisplayViewModel();
         public FileViewModel FileVM { get; set; } = new FileViewModel();
 
+
         ConnectModel model = new ConnectModel();
         CvsInSight _isInSightSensor = new CvsInSight();
 
@@ -26,6 +27,7 @@ namespace InSight_Manager.ViewModel
         private string _isOnlineText = "Offline";
         private string _connectStatus = "Offline";
         private Brush _isOnline = Brushes.Red;
+
 
 
         private IDisplayController _displayController;
@@ -42,6 +44,7 @@ namespace InSight_Manager.ViewModel
                 OnPropertyChanged();
             }
         }
+
 
         public ICommand ToggleOnlineCommand { get; set; }
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -39,6 +40,8 @@ namespace InSight_Manager.Model
                 return SelectedFolderPath;
             }
         }
+
+
 
         public List<string> GetImageFiles(string folderPath)
         {
@@ -125,6 +128,45 @@ namespace InSight_Manager.Model
             }
             return bitmap;
 
+        }
+
+        public async Task FillFilmstripAsync(string folderPath, ObservableCollection<string> FilmstripImages)
+        {
+            if (string.IsNullOrEmpty(folderPath) || !Directory.Exists(folderPath)) return;
+
+            // 1. 기존 리스트 비우기 (UI 스레드)
+            FilmstripImages.Clear();
+
+            // 2. 파일 목록을 가져오는 작업은 무거울 수 있으니 비동기로 진행
+            await Task.Run(() =>
+            {
+                try
+                {
+                    string extensions = ".bmp";
+
+                    // 폴더 내 파일 검색 및 필터링
+                    var files = Directory.EnumerateFiles(folderPath)
+                                         .Where(file => extensions.Contains(Path.GetExtension(file).ToLower()))
+                                         .OrderBy(file => File.GetCreationTime(file)) // 생성 순서대로
+                                         .ToList();
+
+                    // 3. 찾은 파일들을 UI 리스트에 추가
+                    // ObservableCollection은 UI 스레드에서 수정해야 하므로 Dispatcher를 사용합니다.
+                    foreach (var file in files)
+                    {
+                        Application.Current.Dispatcher.Invoke(() =>
+                        {
+                            FilmstripImages.Add(file);
+                        });
+                    }
+                }
+                catch (Exception ex)
+                {
+                    // [불확실함]:
+                    // 폴더 접근 권한 문제나 다른 프로그램이 파일을 사용 중일 때 예외가 발생할 수 있습니다.
+                    System.Diagnostics.Debug.WriteLine($"파일 목록 로드 실패: {ex.Message}");
+                }
+            });
         }
     }
 }

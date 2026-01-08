@@ -1,6 +1,7 @@
 ﻿using Cognex.InSight;
 using Cognex.InSight.Controls.Display;
 using InSight_Manager.View;
+using System;
 using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Forms.Integration;
@@ -35,7 +36,7 @@ namespace InSight_Manager.View // 네임스페이스는 프로젝트에 맞게 �
             {
 
                 display.InSight = e.NewValue as CvsInSight;
-                display.ImageScale = 0.7;
+                display.ImageScale = 0.65;
 
                 var viewModelController = GetController(host);
                 if (viewModelController == null)
@@ -61,7 +62,7 @@ namespace InSight_Manager.View // 네임스페이스는 프로젝트에 맞게 �
             public void SetZoomOut(double scale) => _display.ImageScale -= scale;
             public void SetGrid(bool show) { _display.ShowGrid = show; _display.Invalidate(); }
             public void SetGraphics(bool show) => _display.ShowGraphics = show;
-            public void FitImage() => _display.ImageScale = 0.7;
+            public void FitImage() => _display.ImageScale = 0.65;
             public void OpenJob(string filepath)
             {
                 _display.InSight.File.LoadJobFileLocally(filepath);
@@ -77,10 +78,23 @@ namespace InSight_Manager.View // 네임스페이스는 프로젝트에 맞게 �
 
             public void IsOnline(bool online) => _display.SoftOnline = online;
 
-            //public void SetFilmstrip(bool show) => _display.InSight.Sensor.
+            public void ShowImage(string filePath)
+            {
+                try
+                {
 
+                    if (_display != null && !string.IsNullOrEmpty(filePath))
+                    {
+                        _display.Edit.OpenImageFromFile(filePath);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"이미지 로드 실패: {ex.Message}");
+                }
+            }
 
-             //★ [신규 기능 2] 레코드 재생 옵션(설정창)
+            //★ [신규 기능 2] 레코드 재생 옵션(설정창)
             //public void ShowRecordOptions()
             //{
             //    if (_display.InSight != null)
