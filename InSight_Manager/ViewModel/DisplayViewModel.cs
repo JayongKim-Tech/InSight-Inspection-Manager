@@ -43,7 +43,6 @@ namespace InSight_Manager.ViewModel
             ToggleGraphicsCommand = new RelayCommand(ShowGraphicView);
         }
 
-        // --- 함수들 (자용님 코드 그대로 이동) ---
 
         private void ToggleSpreadsheet(object obj)
         {

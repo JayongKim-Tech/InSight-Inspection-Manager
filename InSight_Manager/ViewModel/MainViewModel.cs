@@ -4,6 +4,7 @@ using InSight_Inspection_Manager;
 using InSight_Manager.Model;
 using InSight_Manager.View;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -89,25 +90,15 @@ namespace InSight_Manager.ViewModel
 
             ToggleOnlineCommand = new RelayCommand(SetOnline);
 
-
-            OnConnect(); // 초기 실행
         }
 
-
-        private void OnConnect()
+        public async Task<bool> InitializeAsync()
         {
-
-            if (model.ConnectToEmulator(IsInSightSensor, IpAddress))
+            return await Task.Run(() =>
             {
-                MessageBox.Show("Insight Connect Complete!");
-                ConnectionStatusText = "Connected";
-            }
-            else
-            {
-                ConnectionStatusText = "Disconnected";
-            }
+                return model.ConnectToEmulator(IsInSightSensor, IpAddress);
+            });
         }
-
 
 
         private void SetOnline(object obj)

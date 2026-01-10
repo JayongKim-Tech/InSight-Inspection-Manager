@@ -1,9 +1,8 @@
-﻿<Application x:Class="Insight_Manager.App"
+﻿<Application x:Class="InSight_Manager.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="clr-namespace:Insight_Manager"
-             StartupUri="View/MainWindow.xaml">
-    <Application.Resources>
+             xmlns:local="clr-namespace:InSight_Manager">
 
+    <Application.Resources>
     </Application.Resources>
 </Application>
