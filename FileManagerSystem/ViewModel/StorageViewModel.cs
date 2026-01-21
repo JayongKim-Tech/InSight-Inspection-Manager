@@ -94,6 +94,10 @@ namespace FileManagerSystem.ViewModel
         // 4. 생성자
         public StorageViewModel()
         {
+            _fileModel.OnFileArchived += async (path) =>
+                await System.Windows.Application.Current.Dispatcher.InvokeAsync(RefreshCapacityAsync);
+
+
             ToggleEngineCommand = new RelayCommand(o =>
             {
                 // 1. 상태 반전
@@ -103,8 +107,11 @@ namespace FileManagerSystem.ViewModel
                 string status = IsRunning ? "시작" : "중지";
                 logVm.AddLog($"[시스템] 모니터링 엔진이 {status}되었습니다.");
 
-                // 3. (디버깅용) 만약 로그도 안 찍히면 이 메시지 박스가 뜨는지 보세요.
-                // System.Windows.MessageBox.Show($"엔진 상태: {status}");
+                if (IsRunning)
+                    _fileModel.StartWatcher(SourcePath, TargetPath);
+                else
+                    _fileModel.StopWatcher();
+
             });
 
 
@@ -119,9 +126,8 @@ namespace FileManagerSystem.ViewModel
                 await RunArchiving();
             });
 
-            // 2초마다 용량을 체크하는 타이머 설정
             _timer = new DispatcherTimer();
-            _timer.Interval = TimeSpan.FromSeconds(2);
+            _timer.Interval = TimeSpan.FromSeconds(5);
             _timer.Tick += async (s, e) =>
             {
                 if (IsRunning)

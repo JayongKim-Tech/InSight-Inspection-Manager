@@ -9,7 +9,7 @@
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance Type=vm:MainViewModel}"
 
-        Title="File Storage Manager" Height="650" Width="950"
+        Title="File System Manager" Height="650" Width="950"
         Background="#F5F5F7" WindowStartupLocation="CenterScreen"
         FontFamily="Segoe UI, Malgun Gothic"
         Icon="FAPLUS.ico">
