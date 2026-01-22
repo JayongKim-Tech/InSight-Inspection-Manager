@@ -71,37 +71,54 @@ namespace FileManagerSystem.Model
                 FileInfo file = new FileInfo(filePath);
                 if (!file.Exists) return false;
 
-                // 파일이 사용 중인지 체크 (잠겨있으면 스킵)
-                if (IsFileLocked(file)) return false;
+                // 1. 파일명 추출 (확장자 제외): "01-21-2026 15.06.31.808_OK_1_TP1"
+                string fileNameOnly = Path.GetFileNameWithoutExtension(file.Name);
 
-                string yearFolder = file.LastWriteTime.ToString("yyyy");
-                string dateFolder = file.LastWriteTime.ToString("MM-dd");
+                // 2. 구분자('_'와 ' ')를 기준으로 분리
+                // parts[0] = "01-21-2026", parts[1] = "15.06.31.808", parts[2] = "OK", parts[3] = "1"
+                string[] parts = fileNameOnly.Split(new char[] { '_', ' ' }, StringSplitOptions.RemoveEmptyEntries);
 
-                // 상대 경로 유지 (예: front\good)
-                string relativePath = file.DirectoryName.Replace(sourceRoot, "")
-                                                     .TrimStart(Path.DirectorySeparatorChar);
+                if (parts.Length < 4) return false; // 형식이 맞지 않으면 스킵
 
-                string finalDestDir = Path.Combine(targetRoot, yearFolder, dateFolder, relativePath);
+                // 3. 날짜 분리 ("01-21-2026" -> 월, 일, 연도)
+                string[] dateParts = parts[0].Split('-');
+                string month = dateParts[0];
+                string day = dateParts[1];
+                string year = dateParts[2];
+
+                // 4. 나머지 정보 매핑
+                string timePart = parts[1]; // "15.06.31.808"
+                string resultPart = parts[2]; // "OK" 또는 "NG"
+                string indexPart = parts[3];  // "1"
+                string camName = parts[4]; // "TP2"
+
+                // 5. 타겟 경로 조립: 2026 \ 01 \ 21 \ TP1 \ OK \ 1
+                string finalDestDir = Path.Combine(targetRoot, year, month, day, camName, resultPart, indexPart);
+
+                // 폴더 생성
                 if (!Directory.Exists(finalDestDir)) Directory.CreateDirectory(finalDestDir);
 
-                string destFile = Path.Combine(finalDestDir, file.Name);
+                // 6. 최종 파일명 결정: 시간.bmp (예: 15.06.31.808.bmp)
+                string newFileName = timePart + file.Extension;
+                string destFilePath = Path.Combine(finalDestDir, newFileName);
 
-                if (!File.Exists(destFile))
+                // 7. 이동 실행
+                if (!File.Exists(destFilePath))
                 {
-                    file.MoveTo(destFile);
+                    file.MoveTo(destFilePath);
                 }
                 else
                 {
-                    // 중복 파일명 처리
-                    string newName = Path.GetFileNameWithoutExtension(file.Name)
-                                     + "_" + DateTime.Now.ToString("HHmmssff")
-                                     + Path.GetExtension(file.Name);
-                    file.MoveTo(Path.Combine(finalDestDir, newName));
+                    // 동일 시간 파일 존재 시 중복 방지용 처리
+                    string dupName = timePart + "_" + DateTime.Now.ToString("ssff") + file.Extension;
+                    file.MoveTo(Path.Combine(finalDestDir, dupName));
                 }
+
                 return true;
             }
-            catch
+            catch (Exception ex)
             {
+                System.Diagnostics.Debug.WriteLine($"파일명 분류 에러: {ex.Message}");
                 return false;
             }
         }
