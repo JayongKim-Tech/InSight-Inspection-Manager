@@ -32,18 +32,35 @@ namespace FileManagerSystem.ViewModel
         public double CleanupBufferGB
         {
             get => _cleanupBufferGB;
-            set { _cleanupBufferGB = value; OnPropertyChanged(); }
+            set
+            {
+                _cleanupBufferGB = value;
+                OnPropertyChanged();
+                Properties.Settings.Default.Buffer = value;
+                Properties.Settings.Default.Save();
+            }
         }
         public string SourcePath
         {
             get => _sourcePath;
-            set { _sourcePath = value; OnPropertyChanged(); }
+            set
+            {
+                _sourcePath = value;
+                OnPropertyChanged();
+                Properties.Settings.Default.SourcePath = value;
+                Properties.Settings.Default.Save();
+            }
         }
 
         public string TargetPath
         {
             get => _targetPath;
-            set { _targetPath = value; OnPropertyChanged(); }
+            set {
+                _targetPath = value;
+                OnPropertyChanged();
+                Properties.Settings.Default.TargetPath = value;
+                Properties.Settings.Default.Save();
+            }
         }
 
         public double CurrentCapacityGB
@@ -55,7 +72,14 @@ namespace FileManagerSystem.ViewModel
         public double MaxCapacityGB
         {
             get => _maxCapacityGB;
-            set { _maxCapacityGB = value; OnPropertyChanged(); UpdatePercent(); }
+            set
+            {
+                _maxCapacityGB = value;
+                OnPropertyChanged();
+                Properties.Settings.Default.Limit = value;
+                Properties.Settings.Default.Save();
+                UpdatePercent();
+            }
         }
 
         public double CapacityPercent
@@ -94,16 +118,25 @@ namespace FileManagerSystem.ViewModel
         // 4. 생성자
         public StorageViewModel()
         {
+            // 1. 저장된 설정값 불러오기
+            SourcePath = Properties.Settings.Default.SourcePath;
+            TargetPath = Properties.Settings.Default.TargetPath;
+            MaxCapacityGB = Properties.Settings.Default.Limit;
+            CleanupBufferGB = Properties.Settings.Default.Buffer;
+
+            // 2. 이벤트 구독 (파일 이동 시 용량 갱신)
             _fileModel.OnFileArchived += async (path) =>
                 await System.Windows.Application.Current.Dispatcher.InvokeAsync(RefreshCapacityAsync);
 
+            // 3. 엔진 가동 가능 여부 체크
+            bool canStart = !string.IsNullOrEmpty(SourcePath) && !string.IsNullOrEmpty(TargetPath);
 
+            // 4. ToggleEngineCommand 수정 (상태 반전 로직)
             ToggleEngineCommand = new RelayCommand(o =>
             {
-                // 1. 상태 반전
+                // ! 기호를 써서 현재 상태를 반전시켜야 합니다.
                 this.IsRunning = !this.IsRunning;
 
-                // 2. 로그 남기기
                 string status = IsRunning ? "시작" : "중지";
                 logVm.AddLog($"[시스템] 모니터링 엔진이 {status}되었습니다.");
 
@@ -111,33 +144,39 @@ namespace FileManagerSystem.ViewModel
                     _fileModel.StartWatcher(SourcePath, TargetPath);
                 else
                     _fileModel.StopWatcher();
-
             });
 
-
-            IsRunning = false;
-            // 커맨드 초기화
+            // 5. 커맨드 및 타이머 초기화 (기존과 동일)
             SelectSourceCommand = new RelayCommand(o => BrowseFolder("Source"));
             SelectTargetCommand = new RelayCommand(o => BrowseFolder("Target"));
-
-            ManualArchiveCommand = new RelayCommand(async o =>
-            {
-                logVm.AddLog("[수동 실행] 사용자가 백업을 직접 시작했습니다.");
+            ManualArchiveCommand = new RelayCommand(async o => {
+                logVm.AddLog("[수동 실행] 백업 시작");
                 await RunArchiving();
             });
 
             _timer = new DispatcherTimer();
             _timer.Interval = TimeSpan.FromSeconds(5);
-            _timer.Tick += async (s, e) =>
-            {
+            _timer.Tick += async (s, e) => {
                 if (IsRunning)
                 {
-                    await RefreshCapacityAsync(); // 1. 용량 체크 및 삭제
-                    await CheckDailyArchive();    // 2. 날짜 변경 체크 및 이동
+                    await RefreshCapacityAsync();
+                    await CheckDailyArchive();
                 }
             };
             _timer.Start();
-            logVm.AddLog("시스템이 시작되었습니다. 모니터링 중...");
+
+            // ★ 6. 핵심: 프로그램 시작 시 자동 실행 로직
+            if (canStart)
+            {
+                this.IsRunning = true; // UI 버튼 상태를 RUNNING으로 변경
+                _fileModel.StartWatcher(SourcePath, TargetPath); // 실시간 감시 시작
+                logVm.AddLog("[시스템] 저장된 경로로 모니터링을 자동 시작합니다.");
+            }
+            else
+            {
+                this.IsRunning = false;
+                logVm.AddLog("시스템 준비 완료. 경로를 설정하고 엔진을 시작하세요.");
+            }
         }
 
         private async Task CheckDailyArchive()
