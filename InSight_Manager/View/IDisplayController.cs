@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Cognex.InSight;
+using Cognex.InSight.Controls.Display;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,6 +10,9 @@ namespace InSight_Manager.View
 {
     public interface IDisplayController
     {
+        CvsInSight InSightSensor { get; }
+        CvsInSightDisplay InSightDisplay { get; }
+
         void SetZoomIn(double scale);
         void SetZoomOut(double scale);
         void SetGrid(bool show);

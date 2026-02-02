@@ -1,4 +1,7 @@
-﻿using System;
+﻿using Cognex.InSight;
+using Cognex.InSight.Controls.Display;
+using Cognex.InSight.Extensions;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
@@ -42,94 +45,6 @@ namespace InSight_Manager.Model
         }
 
 
-
-        public List<string> GetImageFiles(string folderPath)
-        {
-
-            if(folderPath != null)
-            {
-                // 1. 지원할 확장자 정의 (필요한 거 더 추가하세요)
-                var extensions = new[] { ".jpg", ".jpeg", ".png", ".bmp" };
-
-                // 2. 해당 폴더의 모든 파일을 가져와서 -> 확장자가 맞는 것만 골라냄
-                var files = Directory.GetFiles(folderPath)
-                                     .Where(f => extensions.Contains(Path.GetExtension(f).ToLower()))
-                                     .ToList();
-
-                return files; // 이미지 파일 경로들이 담긴 리스트 반환
-            }
-            return null;
-
-        }
-
-        public String Showiamge(List<string> files)
-        {
-            if (files.Count > 0)
-            {
-                _image = files[currentIndex];
-            }
-
-            return _image;
-
-        }
-        public String NextImage(List<string> files)
-        {
-            if (files.Count-1 > currentIndex)
-            {
-                currentIndex += 1;
-
-                _image = files[currentIndex];
-
-                return _image;
-            }
-            else
-            {
-                currentIndex = 0;
-
-                _image = files[currentIndex];
-
-                return _image;
-            }
-
-
-            }
-
-        public String PrevImage(List<string> files)
-        {
-            if(currentIndex > 0)
-            {
-                currentIndex -= 1;
-
-                _image = files[currentIndex];
-
-                return _image;
-            }
-            else
-            {
-                currentIndex = files.Count - 1;
-
-                _image = files[currentIndex];
-
-                return _image;
-            }
-        }
-
-        public BitmapImage LoadBitmap(string filePath)
-        {
-            BitmapImage bitmap = new BitmapImage();
-
-            if (filePath != null)
-            {
-                bitmap.BeginInit();
-                bitmap.CacheOption = BitmapCacheOption.OnLoad; // 메모리에 올리고 파일 연결 끊기
-                bitmap.UriSource = new Uri(filePath);
-                bitmap.EndInit();
-                bitmap.Freeze();
-            }
-            return bitmap;
-
-        }
-
         public async Task FillFilmstripAsync(string folderPath, ObservableCollection<string> FilmstripImages)
         {
             if (string.IsNullOrEmpty(folderPath) || !Directory.Exists(folderPath)) return;
@@ -167,5 +82,73 @@ namespace InSight_Manager.Model
                 }
             });
         }
+
+
+        public async Task RunBatchProcessAsync(List<string> files, CvsInSight insightSensor, string resultFilePath, CvsInSightDisplay display)
+        {
+            if (files == null || files.Count == 0 || insightSensor == null) return;
+
+            List<string> ngList = new List<string>();
+
+
+            await Task.Run(() =>
+            {
+                for (int i = 0; i < files.Count; i++)
+                {
+                    string currentFile = files[i];
+                    try
+                    {
+                        display.Edit.OpenImageFromFile(currentFile);
+
+                        insightSensor.Results.GetImage(0);
+
+
+                        System.Threading.Thread.Sleep(50);
+
+                        var resultCell = insightSensor.Results.Cells["G67"];
+
+                        // 5. 조건 확인 (0이면 NG/False로 간주)
+                        if (resultCell != null && resultCell.ToString() == "0")
+                        {
+                            ngList.Add($"{Path.GetFileName(currentFile)} : NG (Value: {resultCell})");
+
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        ngList.Add($"{Path.GetFileName(currentFile)} : Error ({ex.Message})");
+                    }
+
+                    // 진행률을 로그나 UI에 출력하고 싶다면 여기서 Dispatcher.Invoke 사용
+                }
+
+                // 6. 결과 파일(텍스트) 생성 및 저장
+                SaveResultsToFile(ngList, resultFilePath);
+            });
+        }
+
+        private void SaveResultsToFile(List<string> ngList, string filePath)
+        {
+            try
+            {
+                StringBuilder sb = new StringBuilder();
+                sb.AppendLine($"--- NG 이미지 리스트 ({DateTime.Now}) ---");
+                sb.AppendLine($"총 검사 수 중 NG 발견 건수: {ngList.Count}");
+                sb.AppendLine("-----------------------------------------");
+
+                foreach (var line in ngList)
+                {
+                    sb.AppendLine(line);
+                }
+
+                File.WriteAllText(filePath, sb.ToString(), Encoding.UTF8);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"결과 저장 실패: {ex.Message}");
+            }
+        }
+
+
     }
 }

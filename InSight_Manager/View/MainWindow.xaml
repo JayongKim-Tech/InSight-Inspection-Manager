@@ -202,8 +202,8 @@
                 <Button Style="{StaticResource ToolbarBtnStyle}" ToolTip="Record Playback Options" Command="{Binding DisplayVM.ShowRecordOptionCommand}">
                     <TextBlock Text="⚙️"/>
                 </Button>
-                <Button Style="{StaticResource ToolbarBtnStyle}" ToolTip="Show/Hide Filmstrip (Slide)" Command="{Binding DisplayVM.ToggleFilmstripCommand}">
-                    <TextBlock Text="🎞️"/>
+                <Button Style="{StaticResource ToolbarBtnStyle}" ToolTip="Batch Run" Command="{Binding FileVM.BatchTestCommand}">
+                    <TextBlock Text="♬"/>
                 </Button>
             </StackPanel>
         </Border>

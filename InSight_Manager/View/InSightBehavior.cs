@@ -58,6 +58,8 @@ namespace InSight_Manager.View // 네임스페이스는 프로젝트에 맞게 �
                 _display = display;
                 _display.InSight = insight;
             }
+            public CvsInSightDisplay InSightDisplay => _display;
+            public CvsInSight InSightSensor => _display.InSight;
             public void SetZoomIn(double scale) => _display.ImageScale += scale;
             public void SetZoomOut(double scale) => _display.ImageScale -= scale;
             public void SetGrid(bool show) { _display.ShowGrid = show; _display.Invalidate(); }
@@ -94,22 +96,7 @@ namespace InSight_Manager.View // 네임스페이스는 프로젝트에 맞게 �
                 }
             }
 
-            //★ [신규 기능 2] 레코드 재생 옵션(설정창)
-            //public void ShowRecordOptions()
-            //{
-            //    if (_display.InSight != null)
-            //    {
-            //        // "Record/Playback Options" 다이얼로그를 띄우는 네이티브 명령어
-            //        try
-            //        {
-            //        }
-            //        catch
-            //        {
-            //            // 만약 Dialogs 접근이 안되면 Native Mode로 시도
-            //            System.Windows.MessageBox.Show("레코드 옵션창을 엽니다.");
-            //        }
-            //    }
-            //}
+
 
         }
 
