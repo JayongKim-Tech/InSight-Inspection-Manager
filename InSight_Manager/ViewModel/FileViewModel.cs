@@ -45,6 +45,8 @@ namespace InSight_Manager.ViewModel
             get => _selectedFilmstripImage;
             set
             {
+                if (isBatchRunning) return;
+
                 _selectedFilmstripImage = value;
                 OnPropertyChanged();
 
@@ -67,6 +69,8 @@ namespace InSight_Manager.ViewModel
                 OnPropertyChanged();
             }
         }
+
+        public bool isBatchRunning {  get; set; }
 
         // 커맨드
         public ICommand SaveJobCommand { get; set; }
@@ -140,7 +144,7 @@ namespace InSight_Manager.ViewModel
             var sensor = DisplayController?.InSightSensor;
             var display = DisplayController?.InSightDisplay;
 
-            if (sensor == null)
+            if (sensor == null) 
             {
                 MessageBox.Show("연결된 센서가 없습니다.", "에러", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
@@ -155,6 +159,8 @@ namespace InSight_Manager.ViewModel
 
             try
             {
+                isBatchRunning = true;
+
                 // 5. 모델 호출 (전수 조사 시작)
                 MessageBox.Show($"{files.Count}장의 이미지 전수 조사를 시작합니다", "배치 실행");
 
@@ -170,9 +176,12 @@ namespace InSight_Manager.ViewModel
                 {
                     System.Diagnostics.Process.Start("notepad.exe", resultFilePath);
                 }
+
+                isBatchRunning = false;
             }
             catch (Exception ex)
             {
+                isBatchRunning = false;
                 MessageBox.Show($"배치 작업 중 오류 발생: {ex.Message}");
             }
         }

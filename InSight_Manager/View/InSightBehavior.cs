@@ -9,6 +9,12 @@ using System.Windows.Media.Imaging;
 
 namespace InSight_Manager.View // 네임스페이스는 프로젝트에 맞게 수정
 {
+    public class CellInfoEventArgs : EventArgs
+    {
+        public string Address { get; set; }
+        public string Formula { get; set; }
+    }
+
     public static class InSightBehavior
     {
 
@@ -53,10 +59,43 @@ namespace InSight_Manager.View // 네임스페이스는 프로젝트에 맞게 �
         private class DisplayControllerWrapper : IDisplayController
         {
             private readonly CvsInSightDisplay _display;
+
+            public event EventHandler<CellInfoEventArgs> CellChanged;
+
             public DisplayControllerWrapper(CvsInSightDisplay display, CvsInSight insight)
             {
                 _display = display;
                 _display.InSight = insight;
+                _display.CurrentCellChanged += Edit_FocusedCellChanged;
+                _display.CurrentCellExpressionChanged += Edit_FocusedCellChanged;
+                _display.CurrentCellExpressionChanged += Palette;
+            }
+            private void Palette(object sender, EventArgs e)
+            {
+
+                _display.CurrentCellExpression.GetEnumerator().MoveNext();
+            }
+            private void Edit_FocusedCellChanged(object sender, EventArgs e)
+            {
+                try
+                {
+                    var cell = _display.CurrentCell.ToString();
+                    var value = _display.CurrentCellExpression.ToString();
+
+                    if (cell != null)
+                    {
+                        // 셀 정보를 담아서 ViewModel로 쏘아올림
+                        CellChanged?.Invoke(this, new CellInfoEventArgs
+                        {
+                            Address = cell,   // 예: "A1"
+                            Formula = value  // 예: "AcquireImage(...)"
+                        });
+                    }
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"셀 정보 추출 실패: {ex.Message}");
+                }
             }
             public CvsInSightDisplay InSightDisplay => _display;
             public CvsInSight InSightSensor => _display.InSight;
@@ -95,6 +134,23 @@ namespace InSight_Manager.View // 네임스페이스는 프로젝트에 맞게 �
                     System.Diagnostics.Debug.WriteLine($"이미지 로드 실패: {ex.Message}");
                 }
             }
+
+            public void ShowDepedencyIncrease()
+            {
+                if(_display.ShowGrid)
+                {
+                    _display.Edit.ShowDependencyLevelsIncrease.Execute();
+                }
+            }
+
+            public void ShowDepedencyDecrease()
+            {
+                if(_display.ShowGrid)
+                {
+                    _display.Edit.ShowDependencyLevelsDecrease.Execute();
+                }
+            }
+
 
 
 

@@ -16,9 +16,6 @@ namespace InSight_Manager.Model
     public class ImageManagerModel
     {
 
-        private string _image;
-        int currentIndex = 0;
-
         public string SelectFolder(string SelectedFolderPath)
         {
             // 1. 다이얼로그 인스턴스 생성 (using을 써서 사용 후 바로 메모리 해제)

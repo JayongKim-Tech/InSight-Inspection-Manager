@@ -1,6 +1,7 @@
 ﻿using InSight_Inspection_Manager;
 using InSight_Manager.Model;
 using InSight_Manager.View;
+using System.Windows;
 using System.Windows.Input;
 
 namespace InSight_Manager.ViewModel
@@ -14,9 +15,33 @@ namespace InSight_Manager.ViewModel
         public IDisplayController DisplayController
         {
             get { return _displayController; }
-            set { _displayController = value; OnPropertyChanged(); }
+            set
+            {
+                _displayController = value;
+                OnPropertyChanged();
+
+                if (_displayController != null)
+                {
+                    _displayController.CellChanged += OnCellChanged;
+                }
+            }
+
         }
 
+        private string _currentCellAddress = "A0 =";
+        public string CurrentCellAddress
+        {
+            get => _currentCellAddress;
+            set { _currentCellAddress = value; OnPropertyChanged(); }
+        }
+
+
+        private string _currentCellFormula = " ";
+        public string CurrentCellFormula
+        {
+            get => _currentCellFormula;
+            set { _currentCellFormula = value; OnPropertyChanged(); }
+        }
 
 
         // 상태 변수 (기존 이름 그대로)
@@ -32,6 +57,10 @@ namespace InSight_Manager.ViewModel
         public ICommand ToggleCustomViewCommand { get; set; }
         public ICommand ToggleGraphicsCommand { get; set; }
 
+        public ICommand ShowDependencyIncrease {  get; set; }
+        public ICommand ShowDependencyDecrease { get; set; }
+
+
         // 생성자
         public DisplayViewModel()
         {
@@ -41,6 +70,8 @@ namespace InSight_Manager.ViewModel
             ZoomOutCommand = new RelayCommand(ZoomOut);
             ToggleCustomViewCommand = new RelayCommand(ShowCustomView);
             ToggleGraphicsCommand = new RelayCommand(ShowGraphicView);
+            ShowDependencyIncrease = new RelayCommand(LevelsIncrease);
+            ShowDependencyDecrease = new RelayCommand(LevelsDecrease);
         }
 
 
@@ -77,6 +108,29 @@ namespace InSight_Manager.ViewModel
             DisplayController?.IsGraphicView(_graphicView); // 리모컨 함수명 유지
         }
 
+        private void LevelsIncrease(object obj)
+        {
+            DisplayController?.ShowDepedencyIncrease();
+        }
+        private void LevelsDecrease(object obj)
+        {
+            DisplayController?.ShowDepedencyDecrease();
+        }
+
+        private void OnCellChanged(object sender, CellInfoEventArgs e)
+        {
+            if(DisplayController.InSightDisplay.ShowGrid)
+            {
+                // UI 업데이트는 안전하게
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    CurrentCellAddress = e.Address + " ="; // "A0 ="
+                    CurrentCellFormula = e.Formula;        // 수식
+
+                });
+            }
+
+        }
 
 
 

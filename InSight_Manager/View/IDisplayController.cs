@@ -28,6 +28,11 @@ namespace InSight_Manager.View
 
         void ShowImage(string filename);
 
+        void ShowDepedencyIncrease();
+        void ShowDepedencyDecrease();
+
+        event EventHandler<CellInfoEventArgs> CellChanged;
+
         //void SetFilmstrip(bool show);      // 하단 슬라이드 (필름스트립)
         //void ShowRecordOptions();          // 레코드 옵션 창 띄우기
 
