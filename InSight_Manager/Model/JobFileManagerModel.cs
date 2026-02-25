@@ -13,7 +13,6 @@ namespace InSight_Manager.Model
         private OpenFileDialog openDlg = new OpenFileDialog();
         private SaveFileDialog saveDlg = new SaveFileDialog();
 
-
         public string OpenJobDlg()
         {
 

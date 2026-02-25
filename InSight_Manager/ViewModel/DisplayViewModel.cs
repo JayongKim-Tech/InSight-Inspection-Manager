@@ -9,23 +9,22 @@ namespace InSight_Manager.ViewModel
     public class DisplayViewModel : ViewModelBase
     {
 
-        // 리모컨 (메인에서 받아올 것임)
         private IDisplayController _displayController;
 
         public IDisplayController DisplayController
         {
-            get { return _displayController; }
+            get => _displayController;
             set
             {
+                if (_displayController != null)
+                    _displayController.CellChanged -= OnCellChanged;
+
                 _displayController = value;
                 OnPropertyChanged();
 
                 if (_displayController != null)
-                {
                     _displayController.CellChanged += OnCellChanged;
-                }
             }
-
         }
 
         private string _currentCellAddress = "A0 =";
@@ -44,6 +43,7 @@ namespace InSight_Manager.ViewModel
         }
 
 
+
         // 상태 변수 (기존 이름 그대로)
         public bool _gridStatus = false;
         public bool _customView = false;
@@ -57,8 +57,9 @@ namespace InSight_Manager.ViewModel
         public ICommand ToggleCustomViewCommand { get; set; }
         public ICommand ToggleGraphicsCommand { get; set; }
 
-        public ICommand ShowDependencyIncrease {  get; set; }
+        public ICommand ShowDependencyIncrease { get; set; }
         public ICommand ShowDependencyDecrease { get; set; }
+
 
 
         // 생성자
@@ -79,6 +80,7 @@ namespace InSight_Manager.ViewModel
         {
             _gridStatus = !_gridStatus;
             DisplayController?.SetGrid(_gridStatus);
+
         }
 
         private void ZoomFit(object obj)
@@ -88,24 +90,24 @@ namespace InSight_Manager.ViewModel
 
         private void ZoomIn(object obj)
         {
-            DisplayController?.SetZoomIn(0.05); // 기존 값 0.05 유지
+            DisplayController?.SetZoomIn(0.05);
         }
 
         private void ZoomOut(object obj)
         {
-            DisplayController?.SetZoomOut(0.05); // 기존 값 0.05 유지
+            DisplayController?.SetZoomOut(0.05);
         }
 
         private void ShowCustomView(object obj)
         {
             _customView = !_customView;
-            DisplayController?.IsCustomView(_customView); // 리모컨 함수명 유지
+            DisplayController?.IsCustomView(_customView);
         }
 
         private void ShowGraphicView(object obj)
         {
             _graphicView = !_graphicView;
-            DisplayController?.IsGraphicView(_graphicView); // 리모컨 함수명 유지
+            DisplayController?.IsGraphicView(_graphicView);
         }
 
         private void LevelsIncrease(object obj)
@@ -119,9 +121,8 @@ namespace InSight_Manager.ViewModel
 
         private void OnCellChanged(object sender, CellInfoEventArgs e)
         {
-            if(DisplayController.InSightDisplay.ShowGrid)
+            if (DisplayController.InSightDisplay.ShowGrid)
             {
-                // UI 업데이트는 안전하게
                 Application.Current.Dispatcher.Invoke(() =>
                 {
                     CurrentCellAddress = e.Address + " ="; // "A0 ="
@@ -132,7 +133,13 @@ namespace InSight_Manager.ViewModel
 
         }
 
-
+        private void OnDisplayChanged()
+        {
+            if(_displayController != null)
+            {
+                //_displayController.InspectionFinished +=
+            }
+        }
 
     }
 }

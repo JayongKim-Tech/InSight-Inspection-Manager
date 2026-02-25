@@ -32,6 +32,7 @@ namespace InSight_Manager.View
         void ShowDepedencyDecrease();
 
         event EventHandler<CellInfoEventArgs> CellChanged;
+        event EventHandler InspectionFinished;
 
         //void SetFilmstrip(bool show);      // 하단 슬라이드 (필름스트립)
         //void ShowRecordOptions();          // 레코드 옵션 창 띄우기

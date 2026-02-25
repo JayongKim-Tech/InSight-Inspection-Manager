@@ -15,9 +15,6 @@ namespace InSight_Manager.Model
 {
     public class ConnectModel
     {
-
-        public CvsInSight IsInSightSensor { get; private set; }
-
         public bool ConnectToEmulator(CvsInSight IsInSightSensor , string address)
         {
             try

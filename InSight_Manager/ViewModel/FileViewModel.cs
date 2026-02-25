@@ -15,8 +15,6 @@ namespace InSight_Manager.ViewModel
     public class FileViewModel : ViewModelBase
     {
         // 모델
-        JobFileManagerModel jobFileManagerModel = new JobFileManagerModel();
-        ImageManagerModel imageManagerModel = new ImageManagerModel();
 
         private ObservableCollection<string> _filmstripImages = new ObservableCollection<string>();
 
@@ -31,6 +29,8 @@ namespace InSight_Manager.ViewModel
                 OnPropertyChanged();
             }
         }
+
+
         private IDisplayController _displayController;
         public IDisplayController DisplayController
         {
@@ -70,6 +70,18 @@ namespace InSight_Manager.ViewModel
             }
         }
 
+
+        private bool _isShowFilmstrip;
+        public bool IsShowFilmstrip
+        {
+            get => _isShowFilmstrip;
+            set
+            {
+                _isShowFilmstrip = value;
+                OnPropertyChanged();
+            }
+        }
+
         public bool isBatchRunning {  get; set; }
 
         // 커맨드
@@ -78,6 +90,7 @@ namespace InSight_Manager.ViewModel
         public ICommand NewJobCommand { get; set; }
         public ICommand SelectFolderCommand { get; set; }
         public ICommand BatchTestCommand { get; set; }
+        public ICommand ToggleFilmStripCommand { get; set; }
 
 
 
@@ -88,6 +101,7 @@ namespace InSight_Manager.ViewModel
             OpenJobCommand = new RelayCommand(OpenJob);
             NewJobCommand = new RelayCommand(NewJob);
             SelectFolderCommand = new RelayCommand(SeletedFolder);
+            ToggleFilmStripCommand = new RelayCommand(ShowFilmStrip);
 
             BatchTestCommand = new RelayCommand(async (o) => await ExecuteBatchTest());
 
@@ -96,21 +110,21 @@ namespace InSight_Manager.ViewModel
         // --- 함수들 ---
         private void SaveJob(object obj)
         {
-            DisplayController?.SaveJob(jobFileManagerModel.SaveJobDlg());
+            DisplayController?.SaveJob(ModelHub.Instance.jobFileManagerModel.SaveJobDlg());
         }
 
         private void OpenJob(object obj)
         {
-            DisplayController?.OpenJob(jobFileManagerModel.OpenJobDlg());
+            DisplayController?.OpenJob(ModelHub.Instance.jobFileManagerModel.OpenJobDlg());
         }
 
         private async void SeletedFolder(object obj)
         {
-            SelectedFolderPath = imageManagerModel.SelectFolder(SelectedFolderPath);
+            SelectedFolderPath = ModelHub.Instance.imageManagerModel.SelectFolder(SelectedFolderPath);
 
             if (!string.IsNullOrEmpty(SelectedFolderPath))
             {
-                await imageManagerModel.FillFilmstripAsync(SelectedFolderPath, FilmstripImages);
+                await ModelHub.Instance.imageManagerModel.FillFilmstripAsync(SelectedFolderPath, FilmstripImages);
             }
         }
 
@@ -126,7 +140,7 @@ namespace InSight_Manager.ViewModel
             bool isConfirmed = (result == MessageBoxResult.Yes);
 
             if (isConfirmed)
-                jobFileManagerModel.SaveJobDlg();
+                ModelHub.Instance.jobFileManagerModel.SaveJobDlg();
             else
                 DisplayController?.NewJob();
         }
@@ -140,11 +154,10 @@ namespace InSight_Manager.ViewModel
                 return;
             }
 
-            // 2. 센서 객체 확보
             var sensor = DisplayController?.InSightSensor;
             var display = DisplayController?.InSightDisplay;
 
-            if (sensor == null) 
+            if (sensor == null)
             {
                 MessageBox.Show("연결된 센서가 없습니다.", "에러", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
@@ -164,7 +177,7 @@ namespace InSight_Manager.ViewModel
                 // 5. 모델 호출 (전수 조사 시작)
                 MessageBox.Show($"{files.Count}장의 이미지 전수 조사를 시작합니다", "배치 실행");
 
-                await imageManagerModel.RunBatchProcessAsync(files, sensor, resultFilePath, display);
+                await ModelHub.Instance.imageManagerModel.RunBatchProcessAsync(files, sensor, resultFilePath, display);
 
                 // 6. 완료 알림 및 결과 파일 열기
                 var openResult = MessageBox.Show(
@@ -186,5 +199,9 @@ namespace InSight_Manager.ViewModel
             }
         }
 
+        private void ShowFilmStrip(object obj)
+        {
+            IsShowFilmstrip = !IsShowFilmstrip;
+        }
     }
 }

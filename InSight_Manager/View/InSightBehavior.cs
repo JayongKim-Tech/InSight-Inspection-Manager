@@ -47,7 +47,6 @@ namespace InSight_Manager.View // 네임스페이스는 프로젝트에 맞게 �
                 var viewModelController = GetController(host);
                 if (viewModelController == null)
                 {
-                    // 즉석에서 구현체(Wrapper)를 만들어서 보냄
                     SetController(host, new DisplayControllerWrapper(display, display.InSight));
                 }
 
@@ -62,17 +61,24 @@ namespace InSight_Manager.View // 네임스페이스는 프로젝트에 맞게 �
 
             public event EventHandler<CellInfoEventArgs> CellChanged;
 
+            public event EventHandler InspectionFinished;
+
             public DisplayControllerWrapper(CvsInSightDisplay display, CvsInSight insight)
             {
+                if (insight == null || display == null) return;
+
                 _display = display;
                 _display.InSight = insight;
+
                 _display.CurrentCellChanged += Edit_FocusedCellChanged;
+
                 _display.CurrentCellExpressionChanged += Edit_FocusedCellChanged;
                 _display.CurrentCellExpressionChanged += Palette;
+
+                _display.InSight.ResultsChanged += OnSensorResultsChanged;
             }
             private void Palette(object sender, EventArgs e)
             {
-
                 _display.CurrentCellExpression.GetEnumerator().MoveNext();
             }
             private void Edit_FocusedCellChanged(object sender, EventArgs e)
@@ -84,11 +90,10 @@ namespace InSight_Manager.View // 네임스페이스는 프로젝트에 맞게 �
 
                     if (cell != null)
                     {
-                        // 셀 정보를 담아서 ViewModel로 쏘아올림
                         CellChanged?.Invoke(this, new CellInfoEventArgs
                         {
-                            Address = cell,   // 예: "A1"
-                            Formula = value  // 예: "AcquireImage(...)"
+                            Address = cell,
+                            Formula = value
                         });
                     }
                 }
@@ -97,6 +102,12 @@ namespace InSight_Manager.View // 네임스페이스는 프로젝트에 맞게 �
                     System.Diagnostics.Debug.WriteLine($"셀 정보 추출 실패: {ex.Message}");
                 }
             }
+
+            private void OnSensorResultsChanged(object sender, EventArgs e)
+            {
+                InspectionFinished?.Invoke(this, EventArgs.Empty);
+            }
+
             public CvsInSightDisplay InSightDisplay => _display;
             public CvsInSight InSightSensor => _display.InSight;
             public void SetZoomIn(double scale) => _display.ImageScale += scale;

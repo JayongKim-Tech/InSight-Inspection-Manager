@@ -18,22 +18,17 @@ namespace InSight_Manager.Model
 
         public string SelectFolder(string SelectedFolderPath)
         {
-            // 1. 다이얼로그 인스턴스 생성 (using을 써서 사용 후 바로 메모리 해제)
             using (var dialog = new System.Windows.Forms.FolderBrowserDialog())
             {
-                // 창 상단에 뜰 설명 텍스트
                 dialog.Description = "이미지가 저장된 폴더를 선택하세요";
 
-                // '새 폴더 만들기' 버튼 숨기기 (단순 선택용이면 false 추천)
                 dialog.ShowNewFolderButton = false;
 
-                // 2. 창 띄우기 (사용자가 '확인'을 눌렀는지 체크)
                 System.Windows.Forms.DialogResult result = dialog.ShowDialog();
 
                 // 3. 결과 처리
                 if (result == System.Windows.Forms.DialogResult.OK && !string.IsNullOrWhiteSpace(dialog.SelectedPath))
                 {
-                    // [중요] 사용자가 선택한 경로가 이 변수에 담깁니다.
                     return SelectedFolderPath = dialog.SelectedPath;
                 }
 
@@ -53,11 +48,11 @@ namespace InSight_Manager.Model
             {
                 try
                 {
-                    string extensions = ".bmp";
+                    string[] allowedExtensions = { ".bmp", ".jpg", ".jpeg", ".png", ".tif", ".tiff" };
 
                     // 폴더 내 파일 검색 및 필터링
                     var files = Directory.EnumerateFiles(folderPath)
-                                         .Where(file => extensions.Contains(Path.GetExtension(file).ToLower()))
+                                         .Where(file => allowedExtensions.Contains(Path.GetExtension(file).ToLower()))
                                          .OrderBy(file => File.GetCreationTime(file)) // 생성 순서대로
                                          .ToList();
 
@@ -146,6 +141,10 @@ namespace InSight_Manager.Model
             }
         }
 
+        public void GetImagePath(CvsInSightDisplay sensor)
+        {
+
+        }
 
     }
 }

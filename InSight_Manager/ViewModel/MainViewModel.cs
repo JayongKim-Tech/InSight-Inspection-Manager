@@ -14,11 +14,14 @@ namespace InSight_Manager.ViewModel
 {
     public class MainViewModel : ViewModelBase
     {
+
+        //ViewModel 객체들 여기서 다 생성
+
         public DisplayViewModel DisplayVM { get; set; } = new DisplayViewModel();
         public FileViewModel FileVM { get; set; } = new FileViewModel();
 
+        public InspectionViewModel InspectionVM { get; set; } = new InspectionViewModel();
 
-        ConnectModel model = new ConnectModel();
         CvsInSight _isInSightSensor = new CvsInSight();
 
         // 상태 변수
@@ -41,6 +44,7 @@ namespace InSight_Manager.ViewModel
 
                 DisplayVM.DisplayController = value;
                 FileVM.DisplayController = value;
+                InspectionVM.DisplayController = value;
 
                 OnPropertyChanged();
             }
@@ -96,7 +100,7 @@ namespace InSight_Manager.ViewModel
         {
             return await Task.Run(() =>
             {
-                return model.ConnectToEmulator(IsInSightSensor, IpAddress);
+                return ModelHub.Instance.connectModel.ConnectToEmulator(IsInSightSensor, IpAddress);
             });
         }
 

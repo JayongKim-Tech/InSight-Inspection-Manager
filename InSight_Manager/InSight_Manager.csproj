@@ -67,10 +67,14 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Model\CellResultCheckModel.cs" />
     <Compile Include="Model\ImageManagerModel.cs" />
+    <Compile Include="Model\InspectionMangerModel.cs" />
     <Compile Include="Model\JobFileManagerModel.cs" />
+    <Compile Include="Model\ModelHub.cs" />
     <Compile Include="ViewModel\DisplayViewModel.cs" />
     <Compile Include="ViewModel\FileViewModel.cs" />
+    <Compile Include="ViewModel\InspectionViewModel.cs" />
     <Compile Include="View\IDisplayController.cs" />
     <Compile Include="View\InSightBehavior.cs" />
     <Compile Include="View\MainWindow.xaml.cs">
